@@ -5,6 +5,6 @@
  * Copyright 2010, Chungmin Lee
  * Licensed under the MIT license.
  *
- * Date: 2010-09-13 06:59:09 +0900
- * Version: 1.0
+ * Date: 2010-09-13 07:13:41 +0900
+ * Version: 1.0_1
  */
