@@ -1,0 +1,11 @@
+hangul.js is a simple JavaScript library that provides functions to manipulate
+texts written in Hangul. Each of the functions is capable of a specific task:
+
+* to check if a character represents a syllable
+* to disassemble a syllable into segments and vice versa
+* to convert texts between typed on different input methods
+  (e.g. Dubeol-sik <-> QWERTY)
+* etc.
+
+You can see the full demonstration at http://lemon-factory.net/haconv/ and
+http://lemeon-factory.net/hconv/.
