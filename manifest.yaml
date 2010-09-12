@@ -1,0 +1,9 @@
+src_dir: src
+dist_dir: dist
+yuicompressor: lib/yuicompressor-2.4.2.jar
+combine_order:
+  - summary.js
+  - lang.js
+  - hangul.js
+  - hangul.*.js
+combine_name: hangul.js

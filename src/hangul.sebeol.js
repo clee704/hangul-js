@@ -1,0 +1,222 @@
+// Converts between Sebeolsik Final and QWERTY.
+// Author: Chungmin Lee (lemonedo@gmail.com)
+// Date: 2010-07-21 00:27:17 +0900
+
+if (!hangul)
+    throw new Error('module "hangul" not found');
+
+
+(function (hangul) {
+
+
+// prevent redefining the "undefined"
+var undefined = void(0);
+
+
+var Wrap = (function () {
+    var cache = {};
+    return function (type, c)  {
+        var entry = cache[type] || (cache[type] = {});
+        return entry[c] || (entry[c] = new Character(type, c));
+    }
+})();
+
+function Character(type, c) {
+    this.type = type;
+    this.c = c;
+    this.code = c.charCodeAt(0);
+    this.string = type + '[' + c + ']';
+}
+
+Character.prototype.toString = function () {
+    return this.string;
+}
+
+var map = new hangul.Dict();
+map.addAll({
+    '\'': initial('\u314c'), '0': initial('\u314b'), ';': initial('\u3142'),
+    'h': initial('\u3134'), 'i': initial('\u3141'), 'j': initial('\u3147'),
+    'k': initial('\u3131'), 'l': initial('\u3148'), 'm': initial('\u314e'),
+    'n': initial('\u3145'), 'o': initial('\u314a'), 'p': initial('\u314d'),
+    'u': initial('\u3137'), 'y': initial('\u3139'), '4': medial('\u315b'),
+    '5': medial('\u3160'), '6': medial('\u3151'), '7': medial('\u3156'),
+    '8': medial('\u3162'), 'G': medial('\u3152'), 'b': medial('\u315c'),
+    'c': medial('\u3154'), 'd': medial('\u3163'), 'e': medial('\u3155'),
+    'f': medial('\u314f'), 'g': medial('\u3161'), 'r': medial('\u3150'),
+    't': medial('\u3153'), 'v': medial('\u3157'), '/': medialSp('\u3157'),
+    '9': medialSp('\u315c'), '!': final_('\u3132'), '#': final_('\u3148'),
+    '$': final_('\u313f'), '%': final_('\u313e'), '1': final_('\u314e'),
+    '2': final_('\u3146'), '3': final_('\u3142'), '@': final_('\u313a'),
+    'A': final_('\u3137'), 'C': final_('\u314b'), 'D': final_('\u313c'),
+    'E': final_('\u3135'), 'F': final_('\u313b'), 'Q': final_('\u314d'),
+    'R': final_('\u3140'), 'S': final_('\u3136'), 'T': final_('\u313d'),
+    'V': final_('\u3133'), 'W': final_('\u314c'), 'X': final_('\u3144'),
+    'Z': final_('\u314a'), 'a': final_('\u3147'), 'q': final_('\u3145'),
+    's': final_('\u3134'), 'w': final_('\u3139'), 'x': final_('\u3131'),
+    'z': final_('\u3141'), '"': symbol('\u00b7'), '&': symbol('\u201c'),
+    '(': symbol('\''), ')': symbol('~'), '*': symbol('\u201d'),
+    '+': symbol('+'), ',': symbol(','), '-': symbol(')'),
+    '.': symbol('.'), ':': symbol('4'), '<': extra(','),
+    '=': symbol('>'), '>': extra('.'), '?': symbol('!'),
+    'B': symbol('?'), 'H': symbol('0'), 'I': symbol('7'),
+    'J': symbol('1'), 'K': symbol('2'), 'L': symbol('3'),
+    'M': symbol('"'), 'N': symbol('-'), 'O': symbol('8'),
+    'P': symbol('9'), 'U': symbol('6'), 'Y': symbol('5'),
+    '[': symbol('('), '\\': symbol(':'), ']': symbol('<'),
+    '^': symbol('='), '_': symbol(';'), '`': symbol('*'),
+    '{': symbol('%'), '|': symbol('\\'), '}': symbol('/'),
+    '~': symbol('\u203b')
+});
+// deliberatly avoided overlapping keys or values
+
+function initial(c) {
+    return Wrap('initial', c);
+}
+
+function medial(c) {
+    return Wrap('medial', c);
+}
+
+// denotes a medial that may make a compound vowel
+// (there are two such characters, which are mapped by / and 9 repectively)
+function medialSp(c) {
+    return Wrap('medial-special', c);
+}
+
+function final_(c) {
+    return Wrap('final', c);
+}
+
+function symbol(c) {
+    return Wrap('symbol', c);
+}
+
+// to avoid collisions with other symbols when searching inverse
+function extra(c) {
+    return Wrap('extra', c);
+}
+
+
+/**
+ * Converts the specified text typed in QWERTY to a text that the same
+ * keystrokes which made the text would have produced if the input method is
+ * Sebeolsik Final. It assumes the specified text is typed with CapsLock off.
+ * If the text contains characters that cannot be typed in QWERTY, they are
+ * preserved.
+ */
+function fromQwerty(text) {
+    var buffer = [];
+    var temp = [undefined, undefined, undefined];
+    var prev = [];
+    var curr;
+    for (var i = 0; i < text.length; i++) {
+        curr = text.charAt(i);
+        _fromQwerty(buffer, temp, prev, curr);
+    }
+    _flush(buffer, temp, prev);
+    return buffer.join('');
+}
+
+var index = {'initial': 0, 'medial': 1, 'medial-special': 1, 'final': 2};
+var wrapper = {'initial': initial, 'medial': medial, 'final': final_};
+
+function _fromQwerty(buffer, temp, prev, curr) {
+    if (!map.hasKey(curr))
+        return _flush(buffer, temp, prev), buffer.push(curr);
+    curr = map.get(curr);
+    if (!hangul.isJamo(curr.c))
+        return _flush(buffer, temp, prev), buffer.push(curr.c);
+    var i = index[curr.type];
+    var x = temp[i];
+    if (x)
+        var d = hangul.composeDoubleJamo(x.c, curr.c);
+    if (d && (x.type === 'initial' && !temp[1] && !temp[2] &&
+            hangul.isInitial(d) || x.type === 'medial-special')) {
+        delete prev[prev.indexOf(x)];
+        return prev.push(temp[i] = wrapper[curr.type](d));
+    }
+    if (x)
+        _flush(buffer, temp, prev);
+    prev.push(temp[i] = curr);
+}
+
+function _flush(buffer, temp, prev) {
+    temp[2] = temp[2] || '';
+    if (temp[0] && temp[1])
+        buffer.push(hangul.compose(temp[0].c, temp[1].c, temp[2].c));
+    else
+        _push(buffer, prev);
+    temp.length = 0;
+    prev.length = 0;
+}
+
+function _push(buffer, chars) {
+    for (var i = 0; i < chars.length; i++)
+        if (i in chars)
+            buffer.push(chars[i].c);
+}
+
+
+function toQwerty(text) {
+    var buffer = [];
+    for (var i = 0; i < text.length; i++)
+        _toQwerty(buffer, text.charAt(i));
+    return buffer.join('');
+}
+
+function _toQwerty(buffer, curr) {
+    if (hangul.isJamo(curr))
+        return _putJamo(buffer, curr, _getWrapper(curr));
+    if (!hangul.isSyllable(curr))
+        return buffer.push(map.inverse.get(symbol(curr)) || curr);
+    var jamo = hangul.decompose(curr);
+    _putJamo(buffer, jamo[0], initial);
+    _putJamo(buffer, jamo[1], medial);
+    if (jamo[2])
+        _putJamo(buffer, jamo[2], final_);
+}
+
+function _getWrapper(c) {
+    // if the character is a consonant and can be either an initial or a
+    // final, it is not possible to determine whether it is typed as an
+    // intial or a final; here assumes it is an initial
+    return hangul.isInitial(c) ? initial :
+        hangul.isMedial(c) ? medial : final_;
+}
+
+function _putJamo(buffer, c, wrap) {
+    var x = wrap(c);
+    if (map.hasValue(x))
+        return buffer.push(map.inverse.get(x));
+    var cc = hangul.decomposeDoubleJamo(c);
+    var wrap2 = wrap === medial ? medialSp : initial;
+    buffer.push(map.inverse.get(wrap2(cc[0])));
+    buffer.push(map.inverse.get(wrap(cc[1])));
+}
+
+
+function _flatten(map) {
+    var buckets = {};
+    for (var k in map.items) {
+        var v = map.get(k);
+        var bucket = buckets[v.type] || (buckets[v.type] = {});
+        bucket[k] = v.c;
+    }
+    var flatMap = new hangul.Dict();
+    flatMap.addAll(buckets['extra']);
+    flatMap.addAll(buckets['symbol']);
+    flatMap.addAll(buckets['final']);
+    flatMap.addAll(buckets['medial-special']);
+    flatMap.addAll(buckets['medial']);
+    flatMap.addAll(buckets['initial']);
+    return flatMap;
+}
+
+
+hangul.sebeol = {};
+hangul.sebeol.map = _flatten(map);
+hangul.sebeol.fromQwerty = fromQwerty;
+hangul.sebeol.toQwerty = toQwerty;
+
+
+})(hangul);

@@ -1,0 +1,23 @@
+<project name="hangul.js" basedir="." default="run-unit-tests">
+
+    <scriptdef name="rhinounit"
+               src="lib/rhinoUnitAnt.js"
+               language="javascript">
+        <attribute name="options"/>
+        <attribute name="ignoredglobalvars"/>
+        <attribute name="haltOnFirstFailure"/>
+        <attribute name="rhinoUnitUtilPath"/>
+        <element name="fileset" type="fileset"/>
+    </scriptdef>
+
+    <target name="run-unit-tests">
+        <rhinounit options="{verbose:true, stackTrace:true}"
+                   haltOnFirstFailure="true"
+                   rhinoUnitUtilPath="lib/rhinoUnitUtil.js">
+            <fileset dir="test">
+                <include name="test_*.js"/>
+            </fileset>
+        </rhinounit>
+    </target>
+
+</project>
