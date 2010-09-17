@@ -1,5 +1,4 @@
 // Converts between Dubeolsik and QWERTY.
-// Author: Chungmin Lee (lemonedo@gmail.com)
 
 if (!hangul)
     throw new Error('module "hangul" not found');
