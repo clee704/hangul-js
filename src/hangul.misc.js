@@ -1,6 +1,5 @@
 // Miscellaneous functions.
 // Author: Chungmin Lee (lemonedo@gmail.com)
-// Date: 2010-07-21 02:48:25 +0900
 
 if (!hangul)
     throw new Error('module "hangul" not found');

@@ -1,6 +1,5 @@
 // Extensions to the native objects.
 // Author: Chungmin Lee (lemonedo@gmail.com)
-// Date: 2010-07-21 00:26:43 +0900
 
 var lang = {
 

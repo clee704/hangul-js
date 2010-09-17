@@ -1,6 +1,5 @@
 // Converts between Sebeolsik Final and QWERTY.
 // Author: Chungmin Lee (lemonedo@gmail.com)
-// Date: 2010-07-21 00:27:17 +0900
 
 if (!hangul)
     throw new Error('module "hangul" not found');

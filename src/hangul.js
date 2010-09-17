@@ -1,6 +1,5 @@
 // Core functions for hangul text processing.
 // Author: Chungmin Lee (lemonedo@gmail.com)
-// Date: 2010-07-21 00:27:06 +0900
 
 if (!lang)
     throw new Error('module "lang" not found');
