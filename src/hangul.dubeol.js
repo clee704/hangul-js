@@ -1,14 +1,11 @@
-// Converts between Dubeolsik and QWERTY.
-
-if (!hangul)
-    throw new Error('module "hangul" not found');
-
-
-(function (hangul) {
-
-
-// prevent redefining the "undefined"
-var undefined = void(0);
+/*!
+ * hangul.js Dubeol 1.0_1
+ * http://github.com/clee704/hangul-js
+ *
+ * Copyright 2011, Choongmin Lee
+ * Licensed under the MIT license.
+ */
+(function (hangul, undefined) {
 
 
 var map = new hangul.Dict()
@@ -115,10 +112,14 @@ function _toQwerty(buffer, curr) {
 }
 
 
-hangul.dubeol = {};
-hangul.dubeol.map = map;
-hangul.dubeol.fromQwerty = fromQwerty;
-hangul.dubeol.toQwerty = toQwerty;
+var dubeol = {
+    map: map,
+    fromQwerty: fromQwerty,
+    toQwerty: toQwerty
+};
+
+
+hangul.dubeol = dubeol;
 
 
 })(hangul);

@@ -1,14 +1,11 @@
-// Converts between Sebeolsik Final and QWERTY.
-
-if (!hangul)
-    throw new Error('module "hangul" not found');
-
-
-(function (hangul) {
-
-
-// prevent redefining the "undefined"
-var undefined = void(0);
+/*!
+ * hangul.js Sebeol 1.0_1
+ * http://github.com/clee704/hangul-js
+ *
+ * Copyright 2011, Choongmin Lee
+ * Licensed under the MIT license.
+ */
+(function (hangul, undefined) {
 
 
 var Wrap = (function () {
@@ -211,10 +208,14 @@ function _flatten(map) {
 }
 
 
-hangul.sebeol = {};
-hangul.sebeol.map = _flatten(map);
-hangul.sebeol.fromQwerty = fromQwerty;
-hangul.sebeol.toQwerty = toQwerty;
+var sebeol = {
+    map: _flatten(map),
+    fromQwerty: fromQwerty,
+    toQwerty: toQwerty
+};
+
+
+hangul.sebeol = sebeol;
 
 
 })(hangul);

@@ -1,10 +1,11 @@
-// Miscellaneous functions.
-
-if (!hangul)
-    throw new Error('module "hangul" not found');
-
-
-(function (hangul) {
+/*!
+ * hangul.js Misc 1.0_1
+ * http://github.com/clee704/hangul-js
+ *
+ * Copyright 2011, Choongmin Lee
+ * Licensed under the MIT license.
+ */
+(function (hangul, undefined) {
 
 
 /**
@@ -223,14 +224,18 @@ function _isOkToNudge(fin, ini, med) {
 }
 
 
-hangul.misc = {};
-hangul.misc.applyFullWidthStyle = applyFullWidthStyle;
-hangul.misc.withShift = withShift;
-hangul.misc.withNoShift = withNoShift;
-hangul.misc.serialize = serialize;
-hangul.misc.getInitials = getInitials;
-hangul.misc.tugInitials = tugInitials;
-hangul.misc.nudgeFinals = nudgeFinals;
+var misc = {
+    applyFullWidthStyle: applyFullWidthStyle,
+    withShift: withShift,
+    withNoShift: withNoShift,
+    serialize: serialize,
+    getInitials: getInitials,
+    tugInitials: tugInitials,
+    nudgeFinals: nudgeFinals
+};
+
+
+hangul.misc = misc;
 
 
 })(hangul);

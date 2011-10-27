@@ -1,4 +1,3 @@
-eval(loadFile('src/lang.js'));
 eval(loadFile('src/hangul.js'));
 eval(loadFile('src/hangul.dubeol.js'));
 

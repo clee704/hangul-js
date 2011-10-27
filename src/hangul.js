@@ -1,19 +1,44 @@
-// Core functions for hangul text processing.
+// https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/indexOf
+if (!Array.prototype.indexOf) {
+    Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
+        "use strict";
+        if (this === void 0 || this === null) {
+            throw new TypeError();
+        }
+        var t = Object(this);
+        var len = t.length >>> 0;
+        if (len === 0) {
+            return -1;
+        }
+        var n = 0;
+        if (arguments.length > 0) {
+            n = Number(arguments[1]);
+            if (n !== n) { // shortcut for verifying if it's NaN
+                n = 0;
+            } else if (n !== 0 && n !== Infinity && n !== -Infinity) {
+                n = (n > 0 || -1) * Math.floor(Math.abs(n));
+            }
+        }
+        if (n >= len) {
+            return -1;
+        }
+        var k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);
+        for (; k < len; k++) {
+            if (k in t && t[k] === searchElement) {
+                return k;
+            }
+        }
+        return -1;
+    }
+}
 
-if (!lang)
-    throw new Error('module "lang" not found');
+if (!Array.prototype.peek) {
+    Array.prototype.peek = function () {
+        return this[this.length - 1];
+    };
+}
 
 
-var hangul = new function () {
-
-
-// prevent redefining the "undefined"
-var undefined = void(0);
-
-
-/**
- * Constructs a simple set containing the specified arguments.
- */
 function Set() {
     this.items = {};
     for (var i = 0; i < arguments.length; i++)
@@ -31,7 +56,7 @@ Set.prototype.add = function (e) {
 
 /**
  * Constructs a simple dictionary, supporting an inverse view, optionally
- * containing properties of the specified object as entries if it is present. 
+ * containing properties of the specified object as entries if it is present.
  */
 function Dict(o, _inverse) {
     this.items = {};
@@ -257,32 +282,33 @@ function isIotizedVowel(s) {
 }
 
 
-this.Set = Set;
-this.Dict = Dict;
+var hangul = {
 
-this.jamo = jamo;
-this.initials = initials;
-this.medials = medials;
-this.finals = finals;
+    Set: Set,
+    Dict: Dict,
 
-this.isHangul = isHangul;
-this.isSyllable = isSyllable;
-this.isJamo = isJamo;
-this.isInitial = isInitial;
-this.isMedial = isMedial;
-this.isFinal = isFinal;
+    jamo: jamo,
+    initials: initials,
+    medials: medials,
+    finals: finals,
 
-this.getInitial = getInitial;
-this.getMedial = getMedial;
-this.getFinal = getFinal;
+    isHangul: isHangul,
+    isSyllable: isSyllable,
+    isJamo: isJamo,
+    isInitial: isInitial,
+    isMedial: isMedial,
+    isFinal: isFinal,
 
-this.decompose = decompose;
-this.compose = compose;
+    getInitial: getInitial,
+    getMedial: getMedial,
+    getFinal: getFinal,
 
-this.composeDoubleJamo = composeDoubleJamo;
-this.decomposeDoubleJamo = decomposeDoubleJamo;
+    decompose: decompose,
+    compose: compose,
 
-this.isIotizedVowel = isIotizedVowel;
+    composeDoubleJamo: composeDoubleJamo,
+    decomposeDoubleJamo: decomposeDoubleJamo,
 
+    isIotizedVowel: isIotizedVowel
 
-}
+};

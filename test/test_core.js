@@ -1,8 +1,44 @@
-eval(loadFile('src/lang.js'));
 eval(loadFile('src/hangul.js'));
 
 
 testCases(test,
+
+function test_Array_indexOf() {
+    var a = [];
+    assert.that(Boolean(a.indexOf), isTrue());
+    assert.that(a.indexOf('q'), eq(-1));
+    for (var i = 0; i < 100; i++)
+        a.push(i * i);
+    for (var i = 0; i < a.length; i++)
+        assert.that(a.indexOf(a[i]), eq(i));
+    delete a[34];
+    assert.that(a.indexOf(34 * 34), eq(-1));
+},
+
+function simple_usage_of_set() {
+    var set = new hangul.Set('Alfa', 'Bravo', 'Charlie', 'Delta', 'Echo');
+    assert.that(set.has('Alfa'), isTrue());
+    assert.that(set.has('Bravo'), isTrue());
+    assert.that(set.has('charlie'), isFalse());
+},
+
+function simple_usage_of_dict() {
+    var dict = new hangul.Dict({
+        'A': 'Alfa', 'B': 'Bravo', 'C': 'Charlie', 'D': 'Delta', 'E': 'Echo',
+        'F': 'Foxtrot', 'G': 'Golf', 'H': 'Hotel', 'I': 'India',
+        'J': 'Juliett', 'K': 'Kilo', 'L': 'Lima', 'M': 'Mike', 'N': 'November',
+        'O': 'Oscar', 'P': 'Papa', 'Q': 'Quebec', 'R': 'Romeo', 'S': 'Sierra',
+        'T': 'Tango', 'U': 'Uniform', 'V': 'Victor', 'W': 'Whiskey',
+        'X': 'X-ray', 'Y': 'Yankee', 'Z': 'Zulu'
+    });
+    assert.that(dict.get('R'), eq('Romeo'));
+    assert.that(dict.get('J'), eq('Juliett'));
+    assert.that(dict.hasKey('Z'), isTrue());
+    assert.that(dict.inverse.get('Foxtrot'), eq('F'));
+    assert.that(dict.inverse.get('Zulu'), eq('Z'));
+    assert.that(dict.inverse.hasValue('Romeo'), isFalse());
+    assert.that(dict.get('Victor'), eq(undefined));
+},
 
 function test_isHangul() {
     assert.that(hangul.isHangul('ㄱ'), isTrue());
