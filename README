@@ -1,10 +1,11 @@
 hangul.js is a simple JavaScript library that provides functions to manipulate
-texts written in Hangul. Each of the functions is capable of a specific task:
+Hangul text. Each function is capable of a specific task, such as:
 
- * to check if a character represents a syllable
- * to disassemble a syllable into segments and vice versa
- * to convert texts between different input methods (e.g. Dubeol <-> QWERTY)
- * etc.
+  * to check if a character is a Hangul syllabic block (such as "가")
+  * to compose/decompose a Hangul syllabic block from/into jamo
+  * to convert between different input methods (e.g. Dubeol and QWERTY)
+  * and more
 
-You can see the full demonstration at http://lemon-factory.net/haconv/ and
-http://lemon-factory.net/hconv/.
+Applications using this library:
+  * Dubeol/Sebeol/QWERTY Converter (http://lemon-factory.net/haconv)
+  * Versatile Hangul Text Converter (http://lemon-factory.net/hconv)
