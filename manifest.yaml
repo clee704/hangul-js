@@ -1,6 +1,6 @@
 src_dir: src
 dist_dir: dist
-yuicompressor: lib/yuicompressor-2.4.2.jar
+yuicompressor: lib/yuicompressor-2.4.6.jar
 combine_order:
   - intro.js
   - hangul.js
