@@ -165,7 +165,8 @@ function _tugInitials(buffer, text, i, c0, c1, c2, c3) {
         return buffer.push(hangul.compose(c0, c1)), i += 1;
     var d = hangul.composeDoubleJamo(c2, c3);
     if (!hangul.isFinal(d) ||
-            (c3 === '\u314e' && hangul.isMedial(text.charAt(i + 4))))
+            (hangul.isMedial(text.charAt(i + 4)) &&
+             (c3 === '\u314e' || (c2 === c3 && (c2 === '\u3131' || c2 === '\u3145')))))
         return buffer.push(hangul.compose(c0, c1, c2)), i += 2;
     buffer.push(hangul.compose(c0, c1, d));
     return i += 3;

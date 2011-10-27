@@ -92,6 +92,7 @@ function test_tugInitials() {
     test('기지개를 펴고 앉아', '깆익앨을 펵오 앉아');
     test('네가 그런 엄숙한 얼굴을 할 줄은 몰랐다',
         '넥아 글언 엄숙한 얽울을 할 줄은 몰랐다');
+    test('학교 샷시', '학교 샷시');
 },
 
 function test_nudgeFinals() {
