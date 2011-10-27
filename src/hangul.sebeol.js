@@ -1,5 +1,5 @@
 /*!
- * hangul.js Sebeol 1.0_1
+ * hangul.js Sebeol @VERSION
  * http://github.com/clee704/hangul-js
  *
  * Copyright 2011, Choongmin Lee

@@ -5,6 +5,7 @@ import yaml
 def main(argv):
     manifest = yaml.load(open('manifest.yaml'))
     contents = combine(manifest['src_dir'], manifest['combine_order'])
+    contents = contents.replace('@VERSION', manifest['version'])
     temp = tempfile.NamedTemporaryFile(suffix='.js', delete=False)
     temp.write(contents)
     temp.close()

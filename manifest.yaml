@@ -1,9 +1,10 @@
-src_dir: src
-dist_dir: dist
-yuicompressor: lib/yuicompressor-2.4.6.jar
+version: "1.0_1"
+combine_name: hangul.js
 combine_order:
   - intro.js
   - hangul.js
   - outro.js
   - hangul.*.js
-combine_name: hangul.js
+src_dir: src
+dist_dir: dist
+yuicompressor: lib/yuicompressor-2.4.6.jar
