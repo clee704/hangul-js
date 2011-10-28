@@ -101,48 +101,48 @@ function extra(c) {
  */
 function fromQwerty(text) {
     var buffer = [];
-    var temp = [undefined, undefined, undefined];
-    var prev = [];
-    var curr;
+    var block = [undefined, undefined, undefined];
+    var prevJamo = [];
+    var currKey;
     for (var i = 0; i < text.length; i++) {
-        curr = text.charAt(i);
-        _fromQwerty(buffer, temp, prev, curr);
+        currKey = text.charAt(i);
+        _fromQwerty(buffer, block, prevJamo, currKey);
     }
-    _flush(buffer, temp, prev);
+    _flush(buffer, block, prevJamo);
     return buffer.join('');
 }
 
 var index = {'initial': 0, 'medial': 1, 'medial-special': 1, 'final': 2};
 var wrapper = {'initial': initial, 'medial': medial, 'final': final_};
 
-function _fromQwerty(buffer, temp, prev, curr) {
-    if (!map.hasKey(curr))
-        return _flush(buffer, temp, prev), buffer.push(curr);
-    curr = map.get(curr);
-    if (!hangul.isJamo(curr.c))
-        return _flush(buffer, temp, prev), buffer.push(curr.c);
-    var i = index[curr.type];
-    var x = temp[i];
+function _fromQwerty(buffer, block, prevJamo, currKey) {
+    if (!map.hasKey(currKey))
+        return _flush(buffer, block, prevJamo), buffer.push(currKey);
+    var currJamo = map.get(currKey);
+    if (!hangul.isJamo(currJamo.c))
+        return _flush(buffer, block, prevJamo), buffer.push(currJamo.c);
+    var i = index[currJamo.type];
+    var x = block[i];
     if (x)
-        var d = hangul.composeDoubleJamo(x.c, curr.c);
-    if (d && (x.type === 'initial' && !temp[1] && !temp[2] &&
+        var d = hangul.composeDoubleJamo(x.c, currJamo.c);
+    if (d && (x.type === 'initial' && !block[1] && !block[2] &&
             hangul.isInitial(d) || x.type === 'medial-special')) {
-        delete prev[prev.indexOf(x)];
-        return prev.push(temp[i] = wrapper[curr.type](d));
+        delete prevJamo[prevJamo.indexOf(x)];
+        return prevJamo.push(block[i] = wrapper[currJamo.type](d));
     }
     if (x)
-        _flush(buffer, temp, prev);
-    prev.push(temp[i] = curr);
+        _flush(buffer, block, prevJamo);
+    prevJamo.push(block[i] = currJamo);
 }
 
-function _flush(buffer, temp, prev) {
-    temp[2] = temp[2] || '';
-    if (temp[0] && temp[1])
-        buffer.push(hangul.compose(temp[0].c, temp[1].c, temp[2].c));
+function _flush(buffer, block, prevJamo) {
+    block[2] = block[2] || '';
+    if (block[0] && block[1])
+        buffer.push(hangul.compose(block[0].c, block[1].c, block[2].c));
     else
-        _push(buffer, prev);
-    temp.length = 0;
-    prev.length = 0;
+        _push(buffer, prevJamo);
+    block.length = 0;
+    prevJamo.length = 0;
 }
 
 function _push(buffer, chars) {
@@ -159,12 +159,12 @@ function toQwerty(text) {
     return buffer.join('');
 }
 
-function _toQwerty(buffer, curr) {
-    if (hangul.isJamo(curr))
-        return _putJamo(buffer, curr, _getWrapper(curr));
-    if (!hangul.isSyllable(curr))
-        return buffer.push(map.inverse.get(symbol(curr)) || curr);
-    var jamo = hangul.decompose(curr);
+function _toQwerty(buffer, currKey) {
+    if (hangul.isJamo(currKey))
+        return _putJamo(buffer, currKey, _getWrapper(currKey));
+    if (!hangul.isSyllable(currKey))
+        return buffer.push(map.inverse.get(symbol(currKey)) || currKey);
+    var jamo = hangul.decompose(currKey);
     _putJamo(buffer, jamo[0], initial);
     _putJamo(buffer, jamo[1], medial);
     if (jamo[2])

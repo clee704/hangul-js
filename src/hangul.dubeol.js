@@ -32,51 +32,51 @@ map.addAll({
 
 function fromQwerty(text) {
     var buffer = [];
-    var temp = '', prev, curr;
+    var block = '', prevKey, currKey;
     for (var i = 0; i < text.length; i++) {
-        curr = text.charAt(i);
-        temp = _fromQwerty(buffer, temp, prev, curr);
-        prev = curr;
+        currKey = text.charAt(i);
+        block = _fromQwerty(buffer, block, prevKey, currKey);
+        prevKey = currKey;
     }
-    buffer.push(temp);
+    buffer.push(block);
     return buffer.join('');
 }
 
-function _fromQwerty(buffer, temp, prev, curr) {
-    if (!map.hasKey(curr))
-        return buffer.push(temp), curr;
-    curr = map.get(curr);
-    prev = map.get(prev);
-    var d = hangul.composeDoubleJamo(prev, curr);
+function _fromQwerty(buffer, block, prevKey, currKey) {
+    if (!map.hasKey(currKey))
+        return buffer.push(block), currKey;
+    var currJamo = map.get(currKey);
+    var prevJamo = map.get(prevKey);
+    var d = hangul.composeDoubleJamo(prevJamo, currJamo);
     if (map.hasValue(d))
         d = undefined;
-    if (d && !hangul.isSyllable(temp))
+    if (d && !hangul.isSyllable(block))
         return d;
     if (d) {
-        var jamo = hangul.decompose(temp);
+        var jamo = hangul.decompose(block);
         jamo[hangul.isMedial(d) ? 1 : 2] = d;
         return hangul.compose.apply(hangul, jamo);
     }
-    if (hangul.isFinal(curr)) {
-        if (!hangul.isSyllable(temp) || hangul.getFinal(temp) !== '')
-            return buffer.push(temp), curr;
-        var jamo = hangul.decompose(temp);
-        return hangul.compose(jamo[0], jamo[1], curr);
+    if (hangul.isFinal(currJamo)) {
+        if (!hangul.isSyllable(block) || hangul.getFinal(block) !== '')
+            return buffer.push(block), currJamo;
+        var jamo = hangul.decompose(block);
+        return hangul.compose(jamo[0], jamo[1], currJamo);
     }
-    if (hangul.isInitial(curr))
-        return buffer.push(temp), curr;
-    if (hangul.isInitial(temp))
-        return hangul.compose(temp, curr, '');
-    if (!hangul.isSyllable(temp) || !hangul.isInitial(prev))
-        return buffer.push(temp), curr;
-    var jamo = hangul.decompose(temp);
+    if (hangul.isInitial(currJamo))
+        return buffer.push(block), currJamo;
+    if (hangul.isInitial(block))
+        return hangul.compose(block, currJamo, '');
+    if (!hangul.isSyllable(block) || !hangul.isInitial(prevJamo))
+        return buffer.push(block), currJamo;
+    var jamo = hangul.decompose(block);
     if (hangul.isInitial(jamo[2])) {
         buffer.push(hangul.compose(jamo[0], jamo[1], ''));
-        return hangul.compose(jamo[2], curr, '');
+        return hangul.compose(jamo[2], currJamo, '');
     }
     var cc = hangul.decomposeDoubleJamo(jamo[2]);
     buffer.push(hangul.compose(jamo[0], jamo[1], cc[0]));
-    return hangul.compose(cc[1], curr, '');
+    return hangul.compose(cc[1], currJamo, '');
 }
 
 
@@ -87,18 +87,18 @@ function toQwerty(text) {
     return buffer.join('');
 }
 
-function _toQwerty(buffer, curr) {
-    if (map.hasValue(curr))
-        return buffer.push(map.inverse.get(curr));
-    var cc = hangul.decomposeDoubleJamo(curr);
+function _toQwerty(buffer, currKey) {
+    if (map.hasValue(currKey))
+        return buffer.push(map.inverse.get(currKey));
+    var cc = hangul.decomposeDoubleJamo(currKey);
     if (cc) {
         buffer.push(map.inverse.get(cc[0]));
         buffer.push(map.inverse.get(cc[1]));
         return;
     }
-    if (!hangul.isSyllable(curr))
-        return buffer.push(curr);
-    var jamo = hangul.decompose(curr);
+    if (!hangul.isSyllable(currKey))
+        return buffer.push(currKey);
+    var jamo = hangul.decompose(currKey);
     for (var i = 0; i < jamo.length; i++) {
         var c = jamo[i];
         if (map.hasValue(c)) {
