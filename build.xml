@@ -1,4 +1,4 @@
-<project name="hangul.js" basedir="." default="run-unit-tests">
+<project name="hangul.js" basedir="." default="test">
 
     <scriptdef name="rhinounit" src="lib/rhinoUnitAnt.js" language="javascript">
         <attribute name="options"/>
@@ -8,7 +8,7 @@
         <element name="fileset" type="fileset"/>
     </scriptdef>
 
-    <target name="run-unit-tests">
+    <target name="test">
         <rhinounit options="{verbose:true, stackTrace:true}" haltOnFirstFailure="true" rhinoUnitUtilPath="lib/rhinoUnitUtil.js">
             <fileset dir="test">
                 <include name="test_*.js"/>
