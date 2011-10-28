@@ -30,10 +30,10 @@ def main(argv):
         else:
             log('  * Compressed data is written at {0}\n'.format(target_path_min))
 
-def combine(src_dir, combine_order):
+def combine(src_dir, input_files):
     log('  * Collecting files from {0}\n'.format(src_dir))
     paths = []
-    for p in (glob.glob(os.path.join(src_dir, fn)) for fn in combine_order):
+    for p in (glob.glob(os.path.join(src_dir, x)) for x in flatten(input_files)):
         paths.extend(p)
     visited = set()
     contents = []
@@ -44,7 +44,17 @@ def combine(src_dir, combine_order):
         with open(p) as f:
             log('    - Reading {0}\n'.format(p))
             contents.append(f.read())
-    return ''.join(contents)
+    header = ''
+    #modules = [os.path.basename(p) for p in paths if re.search('hangul(\.[^.]+)*\.js$', p)]
+    #if len(modules) > 1:
+    #    header = '/*!\n{0}\n*/\n'.format(',\n'.join(modules))
+    return header + ''.join(contents)
+
+def flatten(x):
+    if isinstance(x, list):
+        return sum(map(flatten, x), [])
+    else:
+        return [x]
 
 def compress(yuicompressor, input_path, output_path):
     args = ['java', '-jar', yuicompressor, '-o', output_path, input_path]

@@ -1,16 +1,16 @@
 version: "1.0_1"
 targets:
-  hangul.js:
+  hangul.js: &core
     - intro.js
     - hangul.js
     - outro.js
-    - hangul.*.js
-  hangul.light.js:
-    - intro.js
-    - hangul.js
-    - outro.js
+  hangul.inputmethods.js: &inputmethods
+    - *core
     - hangul.dubeol.js
     - hangul.sebeol.js
+  hangul.full.js:
+    - *inputmethods
+    - hangul.misc.js
 src_dir: src
 dist_dir: dist
 yuicompressor: lib/yuicompressor-2.4.6.jar
