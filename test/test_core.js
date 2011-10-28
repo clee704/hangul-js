@@ -15,14 +15,14 @@ function test_Array_indexOf() {
     assert.that(a.indexOf(34 * 34), eq(-1));
 },
 
-function simple_usage_of_set() {
+function test_Set() {
     var set = new hangul.Set('Alfa', 'Bravo', 'Charlie', 'Delta', 'Echo');
     assert.that(set.has('Alfa'), isTrue());
     assert.that(set.has('Bravo'), isTrue());
     assert.that(set.has('charlie'), isFalse());
 },
 
-function simple_usage_of_dict() {
+function test_Dict() {
     var dict = new hangul.Dict({
         'A': 'Alfa', 'B': 'Bravo', 'C': 'Charlie', 'D': 'Delta', 'E': 'Echo',
         'F': 'Foxtrot', 'G': 'Golf', 'H': 'Hotel', 'I': 'India',
