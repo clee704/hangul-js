@@ -107,30 +107,29 @@ function fromQwerty(text) {
     for (i = 0; i < text.length; i++) {
         m.next(text.charAt(i));
     }
-    m.next('');
+    m.next();
     return buffer.join('');
 }
 
 function SebeolAutomaton(output) {
     this.output = output;
+    this.currentBlock = undefined;
     this._indexes = {'initial': 0, 'medial': 1, 'medial-special': 1, 'final': 2};
     this._wrappers = {'initial': initial, 'medial': medial, 'final': final_};
-    this._state = {
-        block: [],
-        prevJamos: []
-    };
+    this._jamo = [];
 }
 
 SebeolAutomaton.prototype.next = function (key) {
     var currJamo,
         i,
-        block,
-        prevJamos,
+        jamo,
         x,
         d;
     if (!map.hasKey(key)) {
         this._flush();
-        return this.output.push(key);
+        if (key !== undefined)
+            this.output.push(key);
+        return;
     }
     currJamo = map.get(key);
     if (!hangul.isJamo(currJamo.c)) {
@@ -139,35 +138,27 @@ SebeolAutomaton.prototype.next = function (key) {
         return;
     }
     i = this._indexes[currJamo.type];
-    block = this._state.block;
-    prevJamos = this._state.prevJamos;
-    x = block[i];
+    jamo = this._jamo;
+    x = jamo[i];
     if (x) {
         d = hangul.composeDoubleJamo(x.c, currJamo.c);
-    }
-    if (d && (x.type === 'initial' && !block[1] && !block[2] && hangul.isInitial(d) || x.type === 'medial-special')) {
-        delete prevJamos[prevJamos.indexOf(x)];
-        prevJamos.push(block[i] = this._wrappers[currJamo.type](d));
-        return;
-    }
-    if (x) {
+        if (d && (x.type === 'initial' && !jamo[1] && !jamo[2] && hangul.isInitial(d) || x.type === 'medial-special')) {
+            jamo[i] = this._wrappers[currJamo.type](d);
+            this._renderCurrentBlock();
+            return;
+        }
         this._flush();
     }
-    prevJamos.push(block[i] = currJamo);
+    jamo[i] = currJamo;
+    this._renderCurrentBlock();
 };
 
 SebeolAutomaton.prototype._flush = function () {
-    var buffer = this.output,
-        block = this._state.block,
-        prevJamos = this._state.prevJamos;
-    block[2] = block[2] || '';
-    if (block[0] && block[1]) {
-        buffer.push(hangul.compose(block[0].c, block[1].c, block[2].c));
-    } else {
-        this._push(buffer, prevJamos);
+    if (this.currentBlock !== undefined) {
+        this.output.push(this.currentBlock);
+        this.currentBlock = undefined;
     }
-    block.length = 0;
-    prevJamos.length = 0;
+    this._jamo.length = 0;
 };
 
 SebeolAutomaton.prototype._push = function (buffer, chars) {
@@ -177,6 +168,29 @@ SebeolAutomaton.prototype._push = function (buffer, chars) {
             buffer.push(chars[i].c);
         }
     }
+};
+
+SebeolAutomaton.prototype._renderCurrentBlock = function () {
+    var jamo = this._jamo,
+        b;
+    if (jamo[0]) {
+        if (jamo[1]) {
+            if (jamo[2]) {
+                b = hangul.compose(jamo[0].c, jamo[1].c, jamo[2].c);
+            } else {
+                b = hangul.compose(jamo[0].c, jamo[1].c);
+            }
+        } else {
+            b = jamo[0].c;
+        }
+    } else if (jamo[1]) {
+        b = jamo[1].c;
+    } else if (jamo[2]) {
+        b = jamo[2].c;
+    } else {
+        b = undefined;
+    }
+    this.currentBlock = b;
 };
 
 

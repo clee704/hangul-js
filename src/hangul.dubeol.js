@@ -37,33 +37,31 @@ function fromQwerty(text) {
     for (i = 0; i < text.length; i++) {
         m.next(text.charAt(i));
     }
-    m.next('');
+    m.next();
     return buffer.join('');
 }
 
 function DubeolAutomaton(output) {
     this.output = output;
-    this._state = {
-        block: '',
-        prevJamo: ''
-    };
+    this.currentBlock = undefined;
+    this._prevJamo = undefined;
 }
 
 DubeolAutomaton.prototype.next = function (key) {
-    this._state.block = this._next(key);
+    this.currentBlock = this._next(key);
 };
 
 DubeolAutomaton.prototype._next = function (currKey) {
     var buffer = this.output,
-        block = this._state.block,
+        block = this.currentBlock,
         currJamo = map.get(currKey),
-        prevJamo = this._state.prevJamo,
+        prevJamo = this._prevJamo,
         d,
         cc,
         jamo;
-    this._state.prevJamo = currJamo;
+    this._prevJamo = currJamo;
     if (!map.hasKey(currKey)) {
-        buffer.push(block);
+        this._flush();
         return currKey;
     }
     d = hangul.composeDoubleJamo(prevJamo, currJamo);
@@ -80,21 +78,21 @@ DubeolAutomaton.prototype._next = function (currKey) {
     }
     if (hangul.isFinal(currJamo)) {
         if (!hangul.isSyllable(block) || hangul.getFinal(block) !== '') {
-            buffer.push(block);
+            this._flush();
             return currJamo;
         }
         jamo = hangul.decompose(block);
         return hangul.compose(jamo[0], jamo[1], currJamo);
     }
     if (hangul.isInitial(currJamo)) {
-        buffer.push(block);
+        this._flush();
         return currJamo;
     }
     if (hangul.isInitial(block)) {
         return hangul.compose(block, currJamo, '');
     }
     if (!hangul.isSyllable(block) || !hangul.isInitial(prevJamo)) {
-        buffer.push(block);
+        this._flush();
         return currJamo;
     }
     jamo = hangul.decompose(block);
@@ -105,6 +103,11 @@ DubeolAutomaton.prototype._next = function (currKey) {
     cc = hangul.decomposeDoubleJamo(jamo[2]);
     buffer.push(hangul.compose(jamo[0], jamo[1], cc[0]));
     return hangul.compose(cc[1], currJamo, '');
+};
+
+DubeolAutomaton.prototype._flush = function () {
+    if (this.currentBlock !== undefined)
+        this.output.push(this.currentBlock);
 };
 
 

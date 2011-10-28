@@ -24,13 +24,13 @@ function test_fromQwerty_simple() {
 
 function test_fromQwerty_details() {
     _test_fromQwerty('jdlbaivjgzjgs ltantxuryv [kkvrx, kk/rx-',
-        '이중모음은 정석대로 (꼬ㅐㄱ, 꽥)');
+        '이중모음은 정석대로 (꼬ㅐ, 꽥)');
     _test_fromQwerty(';fAodz pbwjtnngkdhgs jfs u/dz [jfs1, jfS-',
         '받침 풀어쓰기는 안 됨 (안ㅎ, 않)');
     _test_fromQwerty('sbntnkf f;kk9djtvu clurvy nntlzd',
         '순서가 바뀌어도 제대로 써짐');
     _test_fromQwerty('ufs lba"lvanta jd2jgies ovnta kewmf3 ;bwkf [fkk, zkkf-',
-        '단 중·종성 있으면 초성 결합 불가 (가ㄱ, ㅁㄱ가)');
+        '단 중·종성 있으면 초성 결합 불가 (가ㄱ, ㄱ가)');
     _test_fromQwerty('jdlbaivjgzjgs ;famr;fAld jfSjgz [k/zf, 9uzd-',
         '이중모음은 방해받지 않음 (괌, 뒴)');
 },
