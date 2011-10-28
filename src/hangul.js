@@ -55,35 +55,35 @@ Set.prototype.add = function (e) {
 
 
 /**
- * Constructs a simple dictionary, supporting an inverse view, optionally
+ * Constructs a simple map, supporting an inverse view, optionally
  * containing properties of the specified object as entries if it is present.
  */
-function Dict(o, _inverse) {
+function Map(o, _inverse) {
     this.items = {};
-    this.inverse = _inverse || new Dict(undefined, this);
+    this.inverse = _inverse || new Map(undefined, this);
     if (o)
         this.addAll(o);
 }
 
-Dict.prototype.add = function (k, v) {
+Map.prototype.add = function (k, v) {
     this.items[k] = v;
     this.inverse.items[v] = k;
 }
 
-Dict.prototype.addAll = function (o) {
+Map.prototype.addAll = function (o) {
     for (var k in o)
         this.add(k, o[k]);
 }
 
-Dict.prototype.hasKey = function (k) {
+Map.prototype.hasKey = function (k) {
     return k in this.items;
 }
 
-Dict.prototype.hasValue = function (v) {
+Map.prototype.hasValue = function (v) {
     return v in this.inverse.items;
 }
 
-Dict.prototype.get = function (k) {
+Map.prototype.get = function (k) {
     return this.items[k];
 }
 
@@ -109,12 +109,12 @@ var medials = collectJamo(0x314f, 0x3163);
 var finals = collectJamo(0x3131, 0x314e, [7, 18, 24]);
 
 function collectJamo(from, to, exclude) {
-    var dict = new Dict();
+    var map = new Map();
     var length = to - from + 1;
     for (var i = 0, j = 0; i < length; i++)
         if (!exclude || exclude.indexOf(i) < 0)
-            dict.add(j++, String.fromCharCode(i + from));
-    return dict;
+            map.add(j++, String.fromCharCode(i + from));
+    return map;
 }
 
 
@@ -235,7 +235,7 @@ function compose(ini, med, fin) {
 /**
  * List of modern hangul double jamo (clusters and compounds).
  */
-var doubleJamo = new Dict({
+var doubleJamo = new Map({
     '\u3133': '\u3131\u3145', '\u3135': '\u3134\u3148',
     '\u3136': '\u3134\u314e', '\u313a': '\u3139\u3131',
     '\u313b': '\u3139\u3141', '\u313c': '\u3139\u3142',
@@ -285,7 +285,7 @@ function isIotizedVowel(s) {
 var hangul = {
 
     Set: Set,
-    Dict: Dict,
+    Map: Map,
 
     jamo: jamo,
     initials: initials,

@@ -2,7 +2,7 @@ eval(loadFile('src/hangul.js'));
 eval(loadFile('src/hangul.dubeol.js'));
 
 
-var data = new hangul.Dict({
+var data = new hangul.Map({
     '': '',
     'gksrmfdl dks Tjwudy!': '한글이 안 써져요!',
     'dkswdk dlTwl dksgdmaus wjdtlsdmf dlfgdmf tneh dlTdjdy.':

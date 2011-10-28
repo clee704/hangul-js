@@ -8,7 +8,7 @@
 (function (hangul, undefined) {
 
 
-var map = new hangul.Dict()
+var map = new hangul.Map()
 map.addAll({
     'A': '\u3141', 'B': '\u3160', 'C': '\u314a', 'D': '\u3147', 'E': '\u3138',
     'F': '\u3139', 'G': '\u314e', 'H': '\u3157', 'I': '\u3151', 'J': '\u3153',

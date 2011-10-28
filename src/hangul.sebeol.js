@@ -27,7 +27,7 @@ Character.prototype.toString = function () {
     return this.string;
 }
 
-var map = new hangul.Dict();
+var map = new hangul.Map();
 map.addAll({
     '\'': initial('\u314c'), '0': initial('\u314b'), ';': initial('\u3142'),
     'h': initial('\u3134'), 'i': initial('\u3141'), 'j': initial('\u3147'),
@@ -197,7 +197,7 @@ function _flatten(map) {
         var bucket = buckets[v.type] || (buckets[v.type] = {});
         bucket[k] = v.c;
     }
-    var flatMap = new hangul.Dict();
+    var flatMap = new hangul.Map();
     flatMap.addAll(buckets['extra']);
     flatMap.addAll(buckets['symbol']);
     flatMap.addAll(buckets['final']);
