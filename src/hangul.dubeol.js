@@ -32,21 +32,33 @@ map.addAll({
 
 function fromQwerty(text) {
     var buffer = [];
-    var block = '', prevKey, currKey;
-    for (var i = 0; i < text.length; i++) {
-        currKey = text.charAt(i);
-        block = _fromQwerty(buffer, block, prevKey, currKey);
-        prevKey = currKey;
-    }
-    buffer.push(block);
+    var m = new DubeolAutomaton(buffer);
+    for (var i = 0; i < text.length; i++)
+        m.next(text.charAt(i));
+    m.next('');
     return buffer.join('');
 }
 
-function _fromQwerty(buffer, block, prevKey, currKey) {
+function DubeolAutomaton(output) {
+    this.output = output;
+    this._state = {
+        block: '',
+        prevJamo: ''
+    };
+}
+
+DubeolAutomaton.prototype.next = function (key) {
+    this._state.block = this._next(key);
+};
+
+DubeolAutomaton.prototype._next = function (currKey) {
+    var buffer = this.output;
+    var block = this._state.block;
+    var currJamo = map.get(currKey);
+    var prevJamo = this._state.prevJamo;
+    this._state.prevJamo = currJamo;
     if (!map.hasKey(currKey))
         return buffer.push(block), currKey;
-    var currJamo = map.get(currKey);
-    var prevJamo = map.get(prevKey);
     var d = hangul.composeDoubleJamo(prevJamo, currJamo);
     if (map.hasValue(d))
         d = undefined;
@@ -77,7 +89,7 @@ function _fromQwerty(buffer, block, prevKey, currKey) {
     var cc = hangul.decomposeDoubleJamo(jamo[2]);
     buffer.push(hangul.compose(jamo[0], jamo[1], cc[0]));
     return hangul.compose(cc[1], currJamo, '');
-}
+};
 
 
 function toQwerty(text) {
@@ -115,7 +127,8 @@ function _toQwerty(buffer, currKey) {
 var dubeol = {
     map: map,
     fromQwerty: fromQwerty,
-    toQwerty: toQwerty
+    toQwerty: toQwerty,
+    Automaton: DubeolAutomaton
 };
 
 
