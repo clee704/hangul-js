@@ -8,7 +8,7 @@
 (function (hangul, undefined) {
 
 
-var map = new hangul.Map()
+var map = new hangul.Map();
 map.addAll({
     'A': '\u3141', 'B': '\u3160', 'C': '\u314a', 'D': '\u3147', 'E': '\u3138',
     'F': '\u3139', 'G': '\u314e', 'H': '\u3157', 'I': '\u3151', 'J': '\u3153',
@@ -31,10 +31,12 @@ map.addAll({
 
 
 function fromQwerty(text) {
-    var buffer = [];
-    var m = new DubeolAutomaton(buffer);
-    for (var i = 0; i < text.length; i++)
+    var buffer = [],
+        m = new DubeolAutomaton(buffer),
+        i;
+    for (i = 0; i < text.length; i++) {
         m.next(text.charAt(i));
+    }
     m.next('');
     return buffer.join('');
 }
@@ -52,67 +54,90 @@ DubeolAutomaton.prototype.next = function (key) {
 };
 
 DubeolAutomaton.prototype._next = function (currKey) {
-    var buffer = this.output;
-    var block = this._state.block;
-    var currJamo = map.get(currKey);
-    var prevJamo = this._state.prevJamo;
+    var buffer = this.output,
+        block = this._state.block,
+        currJamo = map.get(currKey),
+        prevJamo = this._state.prevJamo,
+        d,
+        cc,
+        jamo;
     this._state.prevJamo = currJamo;
-    if (!map.hasKey(currKey))
-        return buffer.push(block), currKey;
-    var d = hangul.composeDoubleJamo(prevJamo, currJamo);
-    if (map.hasValue(d))
+    if (!map.hasKey(currKey)) {
+        buffer.push(block);
+        return currKey;
+    }
+    d = hangul.composeDoubleJamo(prevJamo, currJamo);
+    if (map.hasValue(d)) {
         d = undefined;
-    if (d && !hangul.isSyllable(block))
+    }
+    if (d && !hangul.isSyllable(block)) {
         return d;
+    }
     if (d) {
-        var jamo = hangul.decompose(block);
+        jamo = hangul.decompose(block);
         jamo[hangul.isMedial(d) ? 1 : 2] = d;
         return hangul.compose.apply(hangul, jamo);
     }
     if (hangul.isFinal(currJamo)) {
-        if (!hangul.isSyllable(block) || hangul.getFinal(block) !== '')
-            return buffer.push(block), currJamo;
-        var jamo = hangul.decompose(block);
+        if (!hangul.isSyllable(block) || hangul.getFinal(block) !== '') {
+            buffer.push(block);
+            return currJamo;
+        }
+        jamo = hangul.decompose(block);
         return hangul.compose(jamo[0], jamo[1], currJamo);
     }
-    if (hangul.isInitial(currJamo))
-        return buffer.push(block), currJamo;
-    if (hangul.isInitial(block))
+    if (hangul.isInitial(currJamo)) {
+        buffer.push(block);
+        return currJamo;
+    }
+    if (hangul.isInitial(block)) {
         return hangul.compose(block, currJamo, '');
-    if (!hangul.isSyllable(block) || !hangul.isInitial(prevJamo))
-        return buffer.push(block), currJamo;
-    var jamo = hangul.decompose(block);
+    }
+    if (!hangul.isSyllable(block) || !hangul.isInitial(prevJamo)) {
+        buffer.push(block);
+        return currJamo;
+    }
+    jamo = hangul.decompose(block);
     if (hangul.isInitial(jamo[2])) {
         buffer.push(hangul.compose(jamo[0], jamo[1], ''));
         return hangul.compose(jamo[2], currJamo, '');
     }
-    var cc = hangul.decomposeDoubleJamo(jamo[2]);
+    cc = hangul.decomposeDoubleJamo(jamo[2]);
     buffer.push(hangul.compose(jamo[0], jamo[1], cc[0]));
     return hangul.compose(cc[1], currJamo, '');
 };
 
 
 function toQwerty(text) {
-    var buffer = [];
-    for (var i = 0; i < text.length; i++)
+    var buffer = [],
+        i;
+    for (i = 0; i < text.length; i++)
         _toQwerty(buffer, text.charAt(i));
     return buffer.join('');
 }
 
 function _toQwerty(buffer, currKey) {
-    if (map.hasValue(currKey))
-        return buffer.push(map.inverse.get(currKey));
-    var cc = hangul.decomposeDoubleJamo(currKey);
+    var cc,
+        jamo,
+        i,
+        c;
+    if (map.hasValue(currKey)) {
+        buffer.push(map.inverse.get(currKey));
+        return;
+    }
+    cc = hangul.decomposeDoubleJamo(currKey);
     if (cc) {
         buffer.push(map.inverse.get(cc[0]));
         buffer.push(map.inverse.get(cc[1]));
         return;
     }
-    if (!hangul.isSyllable(currKey))
-        return buffer.push(currKey);
-    var jamo = hangul.decompose(currKey);
-    for (var i = 0; i < jamo.length; i++) {
-        var c = jamo[i];
+    if (!hangul.isSyllable(currKey)) {
+        buffer.push(currKey);
+        return;
+    }
+    jamo = hangul.decompose(currKey);
+    for (i = 0; i < jamo.length; i++) {
+        c = jamo[i];
         if (map.hasValue(c)) {
             buffer.push(map.inverse.get(c));
             continue;

@@ -9,9 +9,10 @@
 
 
 var Wrap = (function () {
-    var cache = {};
+    var cache = {},
+        entry;
     return function (type, c)  {
-        var entry = cache[type] || (cache[type] = {});
+        entry = cache[type] || (cache[type] = {});
         return entry[c] || (entry[c] = new Character(type, c));
     }
 })();
@@ -100,10 +101,12 @@ function extra(c) {
  * preserved.
  */
 function fromQwerty(text) {
-    var buffer = [];
-    var m = new SebeolAutomaton(buffer);
-    for (var i = 0; i < text.length; i++)
+    var buffer = [],
+        m = new SebeolAutomaton(buffer),
+        i;
+    for (i = 0; i < text.length; i++) {
         m.next(text.charAt(i));
+    }
     m.next('');
     return buffer.join('');
 }
@@ -119,93 +122,122 @@ function SebeolAutomaton(output) {
 }
 
 SebeolAutomaton.prototype.next = function (key) {
-    if (!map.hasKey(key))
-        return this._flush(), this.output.push(key);
-    var currJamo = map.get(key);
-    if (!hangul.isJamo(currJamo.c))
-        return this._flush(), this.output.push(currJamo.c);
-    var i = this._indexes[currJamo.type];
-    var block = this._state.block;
-    var prevJamos = this._state.prevJamos;
-    var x = block[i];
-    if (x)
-        var d = hangul.composeDoubleJamo(x.c, currJamo.c);
-    if (d && (x.type === 'initial' && !block[1] && !block[2] &&
-            hangul.isInitial(d) || x.type === 'medial-special')) {
-        delete prevJamos[prevJamos.indexOf(x)];
-        return prevJamos.push(block[i] = this._wrappers[currJamo.type](d));
-    }
-    if (x)
+    var currJamo,
+        i,
+        block,
+        prevJamos,
+        x,
+        d;
+    if (!map.hasKey(key)) {
         this._flush();
+        return this.output.push(key);
+    }
+    currJamo = map.get(key);
+    if (!hangul.isJamo(currJamo.c)) {
+        this._flush();
+        this.output.push(currJamo.c);
+        return;
+    }
+    i = this._indexes[currJamo.type];
+    block = this._state.block;
+    prevJamos = this._state.prevJamos;
+    x = block[i];
+    if (x) {
+        d = hangul.composeDoubleJamo(x.c, currJamo.c);
+    }
+    if (d && (x.type === 'initial' && !block[1] && !block[2] && hangul.isInitial(d) || x.type === 'medial-special')) {
+        delete prevJamos[prevJamos.indexOf(x)];
+        prevJamos.push(block[i] = this._wrappers[currJamo.type](d));
+        return;
+    }
+    if (x) {
+        this._flush();
+    }
     prevJamos.push(block[i] = currJamo);
 };
 
 SebeolAutomaton.prototype._flush = function () {
-    var buffer = this.output;
-    var block = this._state.block;
-    var prevJamos = this._state.prevJamos;
+    var buffer = this.output,
+        block = this._state.block,
+        prevJamos = this._state.prevJamos;
     block[2] = block[2] || '';
-    if (block[0] && block[1])
+    if (block[0] && block[1]) {
         buffer.push(hangul.compose(block[0].c, block[1].c, block[2].c));
-    else
+    } else {
         this._push(buffer, prevJamos);
+    }
     block.length = 0;
     prevJamos.length = 0;
 };
 
 SebeolAutomaton.prototype._push = function (buffer, chars) {
-    for (var i = 0; i < chars.length; i++)
-        if (i in chars)
+    var i;
+    for (i = 0; i < chars.length; i++) {
+        if (i in chars) {
             buffer.push(chars[i].c);
+        }
+    }
 };
 
 
 function toQwerty(text) {
-    var buffer = [];
-    for (var i = 0; i < text.length; i++)
+    var buffer = [],
+        i;
+    for (i = 0; i < text.length; i++) {
         _toQwerty(buffer, text.charAt(i));
+    }
     return buffer.join('');
 }
 
 function _toQwerty(buffer, currKey) {
-    if (hangul.isJamo(currKey))
+    var jamo;
+    if (hangul.isJamo(currKey)) {
         return _putJamo(buffer, currKey, _getWrapper(currKey));
-    if (!hangul.isSyllable(currKey))
+    }
+    if (!hangul.isSyllable(currKey)) {
         return buffer.push(map.inverse.get(symbol(currKey)) || currKey);
-    var jamo = hangul.decompose(currKey);
+    }
+    jamo = hangul.decompose(currKey);
     _putJamo(buffer, jamo[0], initial);
     _putJamo(buffer, jamo[1], medial);
-    if (jamo[2])
+    if (jamo[2]) {
         _putJamo(buffer, jamo[2], final_);
+    }
 }
 
 function _getWrapper(c) {
     // if the character is a consonant and can be either an initial or a
     // final, it is not possible to determine whether it is typed as an
     // intial or a final; here assumes it is an initial
-    return hangul.isInitial(c) ? initial :
-        hangul.isMedial(c) ? medial : final_;
+    return hangul.isInitial(c) ? initial : hangul.isMedial(c) ? medial : final_;
 }
 
 function _putJamo(buffer, c, wrap) {
-    var x = wrap(c);
-    if (map.hasValue(x))
+    var x = wrap(c),
+        cc,
+        wrap2;
+    if (map.hasValue(x)) {
         return buffer.push(map.inverse.get(x));
-    var cc = hangul.decomposeDoubleJamo(c);
-    var wrap2 = wrap === medial ? medialSp : initial;
+    }
+    cc = hangul.decomposeDoubleJamo(c);
+    wrap2 = wrap === medial ? medialSp : initial;
     buffer.push(map.inverse.get(wrap2(cc[0])));
     buffer.push(map.inverse.get(wrap(cc[1])));
 }
 
 
 function _flatten(map) {
-    var buckets = {};
-    for (var k in map.items) {
-        var v = map.get(k);
-        var bucket = buckets[v.type] || (buckets[v.type] = {});
+    var buckets = {},
+        k,
+        v,
+        bucket,
+        flatMap;
+    for (k in map.items) {
+        v = map.get(k);
+        bucket = buckets[v.type] || (buckets[v.type] = {});
         bucket[k] = v.c;
     }
-    var flatMap = new hangul.Map();
+    flatMap = new hangul.Map();
     flatMap.addAll(buckets['extra']);
     flatMap.addAll(buckets['symbol']);
     flatMap.addAll(buckets['final']);

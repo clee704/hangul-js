@@ -29,29 +29,25 @@ if (!Array.prototype.indexOf) {
             }
         }
         return -1;
-    }
-}
-
-if (!Array.prototype.peek) {
-    Array.prototype.peek = function () {
-        return this[this.length - 1];
     };
 }
 
 
 function Set() {
+    var i;
     this.items = {};
-    for (var i = 0; i < arguments.length; i++)
+    for (i = 0; i < arguments.length; i++) {
         this.add(arguments[i]);
+    }
 }
 
 Set.prototype.has = function (e) {
     return e in this.items;
-}
+};
 
 Set.prototype.add = function (e) {
     this.items[e] = 1;
-}
+};
 
 
 /**
@@ -61,31 +57,34 @@ Set.prototype.add = function (e) {
 function Map(o, _inverse) {
     this.items = {};
     this.inverse = _inverse || new Map(undefined, this);
-    if (o)
+    if (o) {
         this.addAll(o);
+    }
 }
 
 Map.prototype.add = function (k, v) {
     this.items[k] = v;
     this.inverse.items[v] = k;
-}
+};
 
 Map.prototype.addAll = function (o) {
-    for (var k in o)
+    var k;
+    for (k in o) {
         this.add(k, o[k]);
-}
+    }
+};
 
 Map.prototype.hasKey = function (k) {
     return k in this.items;
-}
+};
 
 Map.prototype.hasValue = function (v) {
     return v in this.inverse.items;
-}
+};
 
 Map.prototype.get = function (k) {
     return this.items[k];
-}
+};
 
 
 /** List of modern hangul jamo (U+3131-U+3163). */
@@ -96,8 +95,7 @@ var jamo = collectJamo(0x3131, 0x3163);
  * not just initials, but can also be final jamo. Thus many characters in this
  * list overlap with the characters in {finals}.
  */
-var initials = collectJamo(0x3131, 0x314e,
-    [2, 4, 5, 9, 10, 11, 12, 13, 14, 15, 19]);
+var initials = collectJamo(0x3131, 0x314e, [2, 4, 5, 9, 10, 11, 12, 13, 14, 15, 19]);
 
 /** List of modern hangul medials. */
 var medials = collectJamo(0x314f, 0x3163);
@@ -109,11 +107,14 @@ var medials = collectJamo(0x314f, 0x3163);
 var finals = collectJamo(0x3131, 0x314e, [7, 18, 24]);
 
 function collectJamo(from, to, exclude) {
-    var map = new Map();
-    var length = to - from + 1;
-    for (var i = 0, j = 0; i < length; i++)
-        if (!exclude || exclude.indexOf(i) < 0)
+    var map = new Map(),
+        length = to - from + 1,
+        i;
+    for (i = 0, j = 0; i < length; i++) {
+        if (!exclude || exclude.indexOf(i) < 0) {
             map.add(j++, String.fromCharCode(i + from));
+        }
+    }
     return map;
 }
 
@@ -195,8 +196,8 @@ function getMedial(s) {
  * if the character is not a hangul syllable.
  */
 function getFinal(s) {
-    var code = s && s.charCodeAt && s.charCodeAt(0);
-    var i = (code - 0xac00) % 28;
+    var code = s && s.charCodeAt && s.charCodeAt(0),
+        i = (code - 0xac00) % 28;
     return i > 0 ? finals.get(i - 1) : i === 0 ? '' : undefined;
 }
 
@@ -208,12 +209,15 @@ function getFinal(s) {
  * undefined if the character is not a hangul syllable.
  */
 function decompose(s) {
-    var c = s && s.charAt && s.charAt(0);
-    if (!isSyllable(c))
+    var c = s && s.charAt && s.charAt(0),
+        jamo;
+    if (!isSyllable(c)) {
         return undefined;
-    var jamo = [getInitial(c), getMedial(c), getFinal(c)];
-    if (jamo[2] === '')
+    }
+    jamo = [getInitial(c), getMedial(c), getFinal(c)];
+    if (jamo[2] === '') {
         jamo.pop();
+    }
     return jamo;
 }
 
@@ -224,10 +228,10 @@ function decompose(s) {
  * also be either undefined or an empty string.
  */
 function compose(ini, med, fin) {
-    var x = initials.inverse.get(ini);
-    var y = medials.inverse.get(med);
-    var z = fin === undefined || fin === '' ? 0 : finals.inverse.get(fin) + 1;
-    var c = String.fromCharCode(0xac00 + (x * 21 + y) * 28 + z);
+    var x = initials.inverse.get(ini),
+        y = medials.inverse.get(med),
+        z = fin === undefined || fin === '' ? 0 : finals.inverse.get(fin) + 1,
+        c = String.fromCharCode(0xac00 + (x * 21 + y) * 28 + z);
     return isSyllable(c) ? c : undefined;
 }
 
@@ -269,8 +273,9 @@ function decomposeDoubleJamo(c) {
 }
 
 
-var iotizedVowels = new Set('\u3163', '\u3151', '\u3152', '\u3155', '\u3156',
-    '\u315b', '\u3160');
+var iotizedVowels = new Set(
+    '\u3163', '\u3151', '\u3152', '\u3155', '\u3156', '\u315b', '\u3160'
+);
 
 /**
  * Returns true if the first character of the specified string represents
