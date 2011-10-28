@@ -17,6 +17,9 @@ map.addAll({
     'U': '\u3155', 'V': '\u314d', 'W': '\u3149', 'X': '\u314c', 'Y': '\u315b',
     'Z': '\u314b'
 });
+// all the mappings in the inverse map is overwritten by the following call to
+// addAll except for the five tense consonants, which are mapped by Q, W, E, R
+// and T, repectively.
 map.addAll({
     'a': '\u3141', 'b': '\u3160', 'c': '\u314a', 'd': '\u3147', 'e': '\u3137',
     'f': '\u3139', 'g': '\u314e', 'h': '\u3157', 'i': '\u3151', 'j': '\u3153',
@@ -25,9 +28,6 @@ map.addAll({
     'u': '\u3155', 'v': '\u314d', 'w': '\u3148', 'x': '\u314c', 'y': '\u315b',
     'z': '\u314b'
 });
-// all of the mappings in the inverse map was replaced by the second addAll()
-// except for the five tense consonants, which are mapped by Q, W, E, R and
-// T, repectively.
 
 
 function fromQwerty(text) {

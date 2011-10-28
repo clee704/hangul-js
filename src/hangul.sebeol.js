@@ -28,6 +28,7 @@ Character.prototype.toString = function () {
 }
 
 var map = new hangul.Map();
+// deliberatly avoided overlapping keys or values
 map.addAll({
     '\'': initial('\u314c'), '0': initial('\u314b'), ';': initial('\u3142'),
     'h': initial('\u3134'), 'i': initial('\u3141'), 'j': initial('\u3147'),
@@ -62,7 +63,6 @@ map.addAll({
     '{': symbol('%'), '|': symbol('\\'), '}': symbol('/'),
     '~': symbol('\u203b')
 });
-// deliberatly avoided overlapping keys or values
 
 function initial(c) {
     return Wrap('initial', c);
