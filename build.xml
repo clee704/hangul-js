@@ -16,4 +16,10 @@
         </rhinounit>
     </target>
 
+	<target name="dist">
+		<exec executable="/usr/bin/python" failOnError="true">
+			<arg value="dist.py"/>
+		</exec>
+	</target>
+
 </project>
