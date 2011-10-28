@@ -25,7 +25,7 @@ function Character(type, c) {
 
 Character.prototype.toString = function () {
     return this.string;
-}
+};
 
 var map = new hangul.Map();
 // deliberatly avoided overlapping keys or values
@@ -101,55 +101,63 @@ function extra(c) {
  */
 function fromQwerty(text) {
     var buffer = [];
-    var block = [undefined, undefined, undefined];
-    var prevJamo = [];
-    var currKey;
-    for (var i = 0; i < text.length; i++) {
-        currKey = text.charAt(i);
-        _fromQwerty(buffer, block, prevJamo, currKey);
-    }
-    _flush(buffer, block, prevJamo);
+    var m = new SebeolAutomaton(buffer);
+    for (var i = 0; i < text.length; i++)
+        m.next(text.charAt(i));
+    m.next('');
     return buffer.join('');
 }
 
-var index = {'initial': 0, 'medial': 1, 'medial-special': 1, 'final': 2};
-var wrapper = {'initial': initial, 'medial': medial, 'final': final_};
+function SebeolAutomaton(output) {
+    this.output = output;
+    this._indexes = {'initial': 0, 'medial': 1, 'medial-special': 1, 'final': 2};
+    this._wrappers = {'initial': initial, 'medial': medial, 'final': final_};
+    this._state = {
+        block: [],
+        prevJamos: []
+    };
+}
 
-function _fromQwerty(buffer, block, prevJamo, currKey) {
-    if (!map.hasKey(currKey))
-        return _flush(buffer, block, prevJamo), buffer.push(currKey);
-    var currJamo = map.get(currKey);
+SebeolAutomaton.prototype.next = function (key) {
+    if (!map.hasKey(key))
+        return this._flush(), this.output.push(key);
+    var currJamo = map.get(key);
     if (!hangul.isJamo(currJamo.c))
-        return _flush(buffer, block, prevJamo), buffer.push(currJamo.c);
-    var i = index[currJamo.type];
+        return this._flush(), this.output.push(currJamo.c);
+    var i = this._indexes[currJamo.type];
+    var block = this._state.block;
+    var prevJamos = this._state.prevJamos;
     var x = block[i];
     if (x)
         var d = hangul.composeDoubleJamo(x.c, currJamo.c);
     if (d && (x.type === 'initial' && !block[1] && !block[2] &&
             hangul.isInitial(d) || x.type === 'medial-special')) {
-        delete prevJamo[prevJamo.indexOf(x)];
-        return prevJamo.push(block[i] = wrapper[currJamo.type](d));
+        delete prevJamos[prevJamos.indexOf(x)];
+        return prevJamos.push(block[i] = this._wrappers[currJamo.type](d));
     }
     if (x)
-        _flush(buffer, block, prevJamo);
-    prevJamo.push(block[i] = currJamo);
-}
+        this._flush();
+    prevJamos.push(block[i] = currJamo);
+};
 
-function _flush(buffer, block, prevJamo) {
+SebeolAutomaton.prototype._flush = function () {
+    var buffer = this.output;
+    var block = this._state.block;
+    var prevJamos = this._state.prevJamos;
     block[2] = block[2] || '';
     if (block[0] && block[1])
         buffer.push(hangul.compose(block[0].c, block[1].c, block[2].c));
     else
-        _push(buffer, prevJamo);
+        this._push(buffer, prevJamos);
     block.length = 0;
-    prevJamo.length = 0;
-}
+    prevJamos.length = 0;
+};
 
-function _push(buffer, chars) {
+SebeolAutomaton.prototype._push = function (buffer, chars) {
     for (var i = 0; i < chars.length; i++)
         if (i in chars)
             buffer.push(chars[i].c);
-}
+};
 
 
 function toQwerty(text) {
@@ -211,7 +219,8 @@ function _flatten(map) {
 var sebeol = {
     map: _flatten(map),
     fromQwerty: fromQwerty,
-    toQwerty: toQwerty
+    toQwerty: toQwerty,
+    Automaton: SebeolAutomaton
 };
 
 
