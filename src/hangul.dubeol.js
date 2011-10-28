@@ -47,6 +47,11 @@ function DubeolAutomaton(output) {
     this._prevJamo = undefined;
 }
 
+DubeolAutomaton.prototype.reset = function () {
+    this.currentBlock = undefined;
+    this._prevJamo = undefined;
+};
+
 DubeolAutomaton.prototype.next = function (key) {
     this.currentBlock = this._next(key);
 };
@@ -62,7 +67,9 @@ DubeolAutomaton.prototype._next = function (currKey) {
     this._prevJamo = currJamo;
     if (!map.hasKey(currKey)) {
         this._flush();
-        return currKey;
+        if (currKey !== undefined)
+            buffer.push(currKey);
+        return undefined;
     }
     d = hangul.composeDoubleJamo(prevJamo, currJamo);
     if (map.hasValue(d)) {

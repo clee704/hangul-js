@@ -119,6 +119,11 @@ function SebeolAutomaton(output) {
     this._jamo = [];
 }
 
+SebeolAutomaton.prototype.reset = function () {
+    this.currentBlock = undefined;
+    this._jamo = [];
+};
+
 SebeolAutomaton.prototype.next = function (key) {
     var currJamo,
         i,
