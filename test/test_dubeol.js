@@ -27,6 +27,16 @@ function test_fromQwerty() {
 function test_toQwerty() {
     for (var text in data.inverse.items)
         assert.that(hangul.dubeol.toQwerty(text), eq(data.inverse.get(text)));
+},
+
+function test_backspace() {
+    assert.that(hangul.dubeol.fromQwerty('\b'), eq(''));
+    assert.that(hangul.dubeol.fromQwerty('\b\b'), eq(''));
+    assert.that(hangul.dubeol.fromQwerty('12345\b'), eq('1234'));
+    assert.that(hangul.dubeol.fromQwerty('12345\b\b'), eq('123'));
+    assert.that(hangul.dubeol.fromQwerty('dkssudgktpdy\b'), eq('안녕하세ㅇ'));
+    assert.that(hangul.dubeol.fromQwerty('dkssudgktpdy\b\b'), eq('안녕하세'));
+    assert.that(hangul.dubeol.fromQwerty('dkssudgktpdy\b\b\b'), eq('안녕하'));
 }
 
 );

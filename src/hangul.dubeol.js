@@ -61,10 +61,25 @@ DubeolAutomaton.prototype._next = function (currKey) {
         block = this.currentBlock,
         currJamo = map.get(currKey),
         prevJamo = this._prevJamo,
+        c,
         d,
         cc,
         jamo;
     this._prevJamo = currJamo;
+    if (currKey === '\b') {
+        c = undefined;
+        if (block === undefined) {
+            buffer.pop();
+        } else if (hangul.isSyllable(block)) {
+            jamo = hangul.decompose(block);
+            if (jamo[2]) {
+                c = hangul.compose(jamo[0], jamo[1]);
+            } else {
+                c = jamo[0];
+            }
+        }
+        return c;
+    }
     if (!map.hasKey(currKey)) {
         this._flush();
         if (currKey !== undefined)

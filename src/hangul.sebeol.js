@@ -116,12 +116,14 @@ function SebeolAutomaton(output) {
     this.currentBlock = undefined;
     this._indexes = {'initial': 0, 'medial': 1, 'medial-special': 1, 'final': 2};
     this._wrappers = {'initial': initial, 'medial': medial, 'final': final_};
-    this._jamo = [];
+    this._jamoBlock = [];
+    this._jamoQueue = [];
 }
 
 SebeolAutomaton.prototype.reset = function () {
     this.currentBlock = undefined;
-    this._jamo = [];
+    this._jamoBlock.length = 0;
+    this._jamoQueue.length = 0;
 };
 
 SebeolAutomaton.prototype.next = function (key) {
@@ -130,6 +132,16 @@ SebeolAutomaton.prototype.next = function (key) {
         jamo,
         x,
         d;
+    if (key === '\b') {
+        if (this._jamoQueue.length > 0) {
+            currJamo = this._jamoQueue.pop();
+            delete this._jamoBlock[this._indexes[currJamo.type]];
+            this._renderCurrentBlock();
+        } else {
+            this.output.pop();
+        }
+        return;
+    }
     if (!map.hasKey(key)) {
         this._flush();
         if (key !== undefined)
@@ -143,7 +155,7 @@ SebeolAutomaton.prototype.next = function (key) {
         return;
     }
     i = this._indexes[currJamo.type];
-    jamo = this._jamo;
+    jamo = this._jamoBlock;
     x = jamo[i];
     if (x) {
         d = hangul.composeDoubleJamo(x.c, currJamo.c);
@@ -155,6 +167,7 @@ SebeolAutomaton.prototype.next = function (key) {
         this._flush();
     }
     jamo[i] = currJamo;
+    this._jamoQueue.push(currJamo);
     this._renderCurrentBlock();
 };
 
@@ -163,7 +176,8 @@ SebeolAutomaton.prototype._flush = function () {
         this.output.push(this.currentBlock);
         this.currentBlock = undefined;
     }
-    this._jamo.length = 0;
+    this._jamoBlock.length = 0;
+    this._jamoQueue.length = 0;
 };
 
 SebeolAutomaton.prototype._push = function (buffer, chars) {
@@ -176,7 +190,7 @@ SebeolAutomaton.prototype._push = function (buffer, chars) {
 };
 
 SebeolAutomaton.prototype._renderCurrentBlock = function () {
-    var jamo = this._jamo,
+    var jamo = this._jamoBlock,
         b;
     if (jamo[0]) {
         if (jamo[1]) {

@@ -43,6 +43,18 @@ function test_toQwerty() {
     _test_toQwerty('※ 공원 내 취사 “금지”', '~ kvaj9ts hr o9dnf &kgzld*');
     _test_toQwerty('예를 들면 꿍디꿍디', 'j7ygw ugwies kkbaudkkbaud');
     _test_toQwerty('뽧뀞쀓퀁쮥뙲', ';;/fDkk9dX;;9cR09tEll9d@uu/d$');
+},
+
+function test_backspace() {
+    assert.that(hangul.sebeol.fromQwerty('\b'), eq(''));
+    assert.that(hangul.sebeol.fromQwerty('\b\b'), eq(''));
+    assert.that(hangul.sebeol.fromQwerty('1234\b'), eq('ㅎㅆㅂ'));
+    assert.that(hangul.sebeol.fromQwerty('12345\b'), eq('ㅎㅆㅛ'));
+    assert.that(hangul.sebeol.fromQwerty('12345\b\b'), eq('ㅎㅆ'));
+    assert.that(hangul.sebeol.fromQwerty('jfsheamfncj4\b'), eq('안녕하세ㅇ'));
+    assert.that(hangul.sebeol.fromQwerty('jfsheamfncj4\b\b'), eq('안녕하세'));
+    assert.that(hangul.sebeol.fromQwerty('jfsheamfncj4\b\b\b'), eq('안녕하'));
+    assert.that(hangul.sebeol.fromQwerty('jfsheamfnc4j\b'), eq('안녕하세ㅛ'));
 }
 
 );
