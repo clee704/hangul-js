@@ -82,8 +82,9 @@ DubeolAutomaton.prototype._next = function (currKey) {
     }
     if (!map.hasKey(currKey)) {
         this._flush();
-        if (currKey !== undefined)
+        if (currKey !== undefined) {
             buffer.push(currKey);
+        }
         return undefined;
     }
     d = hangul.composeDoubleJamo(prevJamo, currJamo);
@@ -128,16 +129,18 @@ DubeolAutomaton.prototype._next = function (currKey) {
 };
 
 DubeolAutomaton.prototype._flush = function () {
-    if (this.currentBlock !== undefined)
+    if (this.currentBlock !== undefined) {
         this.output.push(this.currentBlock);
+    }
 };
 
 
 function toQwerty(text) {
     var buffer = [],
         i;
-    for (i = 0; i < text.length; i++)
+    for (i = 0; i < text.length; i++) {
         _toQwerty(buffer, text.charAt(i));
+    }
     return buffer.join('');
 }
 

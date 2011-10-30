@@ -144,8 +144,9 @@ SebeolAutomaton.prototype.next = function (key) {
     }
     if (!map.hasKey(key)) {
         this._flush();
-        if (key !== undefined)
+        if (key !== undefined) {
             this.output.push(key);
+        }
         return;
     }
     currJamo = map.get(key);
