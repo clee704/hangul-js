@@ -1,7 +1,12 @@
 /**
- * hangul-sebeol.js 1.1.1
+ * hangul-sebeol.js
  * http://github.com/clee704/hangul-js
- * @license Copyright 2013, Choongmin Lee; MIT license
+ * @version 1.1.2
+ * @copyright Copyright 2013, Choongmin Lee
+ * @license MIT license
+ */
+/**
+ * @namespace hangul.sebeol
  */
 (function (hangul, undefined) {
 "use strict";
@@ -26,6 +31,10 @@ Character.prototype.toString = function () {
   return this.string;
 };
 
+/**
+ * Key mapping between QWERTY and Sebeolsik.
+ * @member {hangul.Map} hangul.sebeol.map
+ */
 var map = new hangul.Map();
 // deliberatly avoided overlapping keys or values
 map.addAll({
@@ -92,10 +101,12 @@ function extra(c) {
 
 /**
  * Converts the specified text typed in QWERTY to a text that the same
- * keystrokes which made the text would have produced if the input method is
- * Sebeolsik Final. It assumes the specified text is typed with CapsLock off.
- * If the text contains characters that cannot be typed in QWERTY, they are
- * preserved.
+ * keystrokes which made the original text would have produced if the input
+ * method is Sebeolsik Final. It assumes the specified text is typed with
+ * CapsLock off. If the text contains characters that cannot be typed in
+ * QWERTY, they are preserved.
+ * @param {string} text
+ * @function hangul.sebeol.fromQwerty
  */
 function fromQwerty(text) {
   var buffer = [],
@@ -107,8 +118,18 @@ function fromQwerty(text) {
   return buffer.join('');
 }
 
+/**
+ * @constructor
+ * @name hangul.sebeol.Automaton
+ */
 function SebeolAutomaton(output) {
+  /**
+   * @member hangul.sebeol.Automaton#output
+   */
   this.output = output;
+  /**
+   * @member hangul.sebeol.Automaton#currentBlock
+   */
   this.currentBlock = undefined;
   this._indexes = {'initial': 0, 'medial': 1, 'medial-special': 1, 'final': 2};
   this._wrappers = {'initial': initial, 'medial': medial, 'final': final_};
@@ -116,12 +137,19 @@ function SebeolAutomaton(output) {
   this._jamoQueue = [];
 }
 
+/**
+ * @method hangul.sebeol.Automaton#reset
+ */
 SebeolAutomaton.prototype.reset = function () {
   this.currentBlock = undefined;
   this._jamoBlock.length = 0;
   this._jamoQueue.length = 0;
 };
 
+/**
+ * @param {string} key
+ * @method hangul.sebeol.Automaton#next
+ */
 SebeolAutomaton.prototype.next = function (key) {
   var currJamo;
   if (key === '\b') {
@@ -196,6 +224,10 @@ SebeolAutomaton.prototype._renderCurrentBlock = function () {
   this.currentBlock = b;
 };
 
+/**
+ * @param {string} text
+ * @function hangul.sebeol.toQwerty
+ */
 function toQwerty(text) {
   var buffer = [];
   for (var i = 0; i < text.length; i++) {

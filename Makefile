@@ -18,5 +18,9 @@ clean:
 init:
 	npm install -g karma
 	npm install -g uglify-js
+	npm install -g git://github.com/jsdoc3/jsdoc.git
 
-.PHONY: min test karma clean init
+docs:
+	jsdoc -d docs -t jsdoc_template $(sources) README.md
+
+.PHONY: min test karma clean init docs

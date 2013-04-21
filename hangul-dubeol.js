@@ -1,11 +1,20 @@
 /**
- * hangul-dubeol.js 1.1.1
+ * hangul-dubeol.js
  * http://github.com/clee704/hangul-js
- * @license Copyright 2013, Choongmin Lee; MIT license
+ * @version 1.1.2
+ * @copyright Copyright 2013, Choongmin Lee
+ * @license MIT license
+ */
+/**
+ * @namespace hangul.dubeol
  */
 (function (hangul, undefined) {
 "use strict";
 
+/**
+ * Key mapping between QWERTY and Dubeolsik.
+ * @member {hangul.Map} hangul.dubeol.map
+ */
 var map = new hangul.Map();
 map.addAll({
   'A': '\u3141', 'B': '\u3160', 'C': '\u314a', 'D': '\u3147', 'E': '\u3138',
@@ -27,6 +36,10 @@ map.addAll({
   'z': '\u314b'
 });
 
+/**
+ * @param {string} text
+ * @function hangul.dubeol.fromQwerty
+ */
 function fromQwerty(text) {
   var buffer = [],
       m = new DubeolAutomaton(buffer);
@@ -37,17 +50,34 @@ function fromQwerty(text) {
   return buffer.join('');
 }
 
+/**
+ * @constructor
+ * @name hangul.dubeol.Automaton
+ */
 function DubeolAutomaton(output) {
+  /**
+   * @member hangul.dubeol.Automaton#output
+   */
   this.output = output;
+  /**
+   * @member hangul.dubeol.Automaton#currentBlock
+   */
   this.currentBlock = undefined;
   this._prevJamo = undefined;
 }
 
+/**
+ * @method hangul.dubeol.Automaton#reset
+ */
 DubeolAutomaton.prototype.reset = function () {
   this.currentBlock = undefined;
   this._prevJamo = undefined;
 };
 
+/**
+ * @param {string} key
+ * @method hangul.dubeol.Automaton#next
+ */
 DubeolAutomaton.prototype.next = function (key) {
   this.currentBlock = this._next(key);
 };
@@ -121,6 +151,10 @@ DubeolAutomaton.prototype._flush = function () {
   }
 };
 
+/**
+ * @param {string} text
+ * @function hangul.dubeol.toQwerty
+ */
 function toQwerty(text) {
   var buffer = [];
   for (var i = 0; i < text.length; i++) {

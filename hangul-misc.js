@@ -1,13 +1,21 @@
 /**
- * hangul-misc.js 1.1.1
+ * hangul-misc.js
  * http://github.com/clee704/hangul-js
- * @license Copyright 2013, Choongmin Lee; MIT license
+ * @version 1.1.2
+ * @copyright Copyright 2013, Choongmin Lee
+ * @license MIT license
+ */
+/**
+ * Miscellaneous functions
+ * @namespace hangul.misc
  */
 (function (hangul, undefined) {
 "use strict";
 
 /**
  * Writes the specified hangul text in a full-width (全角) style.
+ * @param {string} text
+ * @function hangul.misc.applyFullWidthStyle
  */
 function applyFullWidthStyle(text) {
   var buffer = [];
@@ -26,7 +34,10 @@ function applyFullWidthStyle(text) {
 
 /**
  * Writes the specified hangul text as if it is typed with the shift key
- * pressed all the time. {layout} can be {hangul.dubeol} or {hangul.sebeol}.
+ * pressed all the time.
+ * @param {string} text
+ * @param {namespace} layout {@link hangul.dubeol} or {@link hangul.sebeol}
+ * @function hangul.misc.withShift
  */
 function withShift(text, layout) {
   return _shift(text, layout);
@@ -34,7 +45,10 @@ function withShift(text, layout) {
 
 /**
  * Writes the specified hangul text as if it is typed without using the shift
- * key. {layout} can be {hangul.dubeol} or {hangul.sebeol}.
+ * key.
+ * @param {string} text
+ * @param {namespace} layout {@link hangul.dubeol} or {@link hangul.sebeol}
+ * @function hangul.misc.withNoShift
  */
 function withNoShift(text, layout) {
   return _shift(text, layout, true);
@@ -90,6 +104,8 @@ function _upper(c, reverse) {
 
 /**
  * Writes the specified hangul text in a serialized style (풀어쓰기).
+ * @param {string} text
+ * @function hangul.misc.serialize
  */
 function serialize(text) {
   var buffer = [];
@@ -127,6 +143,8 @@ function _decomposeAll(text, breakFinal) {
 
 /**
  * Writes the specified hangul text in an initials-only style (초성체).
+ * @param {string} text
+ * @function hangul.misc.getInitials
  */
 function getInitials(text) {
   var buffer = [];
@@ -140,7 +158,10 @@ function getInitials(text) {
 /**
  * Moves every initial of hangul syllables in the text to the final of the
  * previous syllable as long as the pronunciation is same (초성 올려 쓰기).
- * example: tugInitials('여기서 놉세') -> '역잇어 놊에'
+ * @example
+ * tugInitials('여기서 놉세');  // returns '역잇어 놊에'
+ * @param {string} text
+ * @function hangul.misc.tugInitials
  */
 function tugInitials(text) {
   var buffer = [];
@@ -193,7 +214,10 @@ function _isOkToTug(c2, c3) {
 /**
  * Moves every final of hangul syllables in the text to the initial of the
  * next syllable as long as the pronunciation is same (종성 내려 쓰기).
- * example: nudgeFinals('남이섬에 가요') -> '나미서메 가요'
+ * @example
+ * nudgeFinals('남이섬에 가요');  // returns '나미서메 가요'
+ * @param {string} text
+ * @function hangul.misc.nudgeFinals
  */
 function nudgeFinals(text) {
   var buffer = [];
