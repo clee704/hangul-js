@@ -1,6 +1,6 @@
 hangul.js
 =========
-[![Build Status](https://secure.travis-ci.org/clee704/hangul-js.png?branch=master)](http://travis-ci.org/clee704/hangul-js)
+[![Build Status](https://secure.travis-ci.org/clee704/hangul-js.png?branch=master) ](http://travis-ci.org/clee704/hangul-js)
 
 hangul.js is a simple JavaScript library that provides functions to manipulate
 Hangul text. Each function is capable of a specific task, such as:
