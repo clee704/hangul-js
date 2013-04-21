@@ -120,7 +120,9 @@ describe('hangul-misc.js', function () {
         [['종성내려쓰기', '종성내려쓰기'],
          ['남이섬에 가요.', '나미서메 가요.'],
          ['동남아 여행객에게 필요한 것은?', '동나마 여행개게게 피료한 거슨?'],
-         ['난안안안안안안앉아', '나나나나나나나난자']],
+         ['난안안안안안안앉아', '나나나나나나나난자'],
+         ['각가', '가까'],
+         ['밑이', '밑이']],
         function (input, output) {
           expect(hangul.misc.nudgeFinals(input)).toEqual(output);
         });

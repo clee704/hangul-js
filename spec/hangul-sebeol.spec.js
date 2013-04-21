@@ -56,7 +56,8 @@ describe('hangul-sebeol.js', function () {
          ['뛰뛰빵빵', 'uu9duu9d;;fa;;fa'],
          ['※ 공원 내 취사 “금지”', '~ kvaj9ts hr o9dnf &kgzld*'],
          ['예를 들면 꿍디꿍디', 'j7ygw ugwies kkbaudkkbaud'],
-         ['뽧뀞쀓퀁쮥뙲', ';;/fDkk9dX;;9cR09tEll9d@uu/d$']],
+         ['뽧뀞쀓퀁쮥뙲', ';;/fDkk9dX;;9cR09tEll9d@uu/d$'],
+         ['ㄲㄲㄲ ㅣㅣㅣ ㅄㅄㅄ', 'kkkkkk ddd XXX']],
         function (input, output) {
           expect(hangul.sebeol.toQwerty(input)).toEqual(output);
         });

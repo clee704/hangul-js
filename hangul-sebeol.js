@@ -173,12 +173,6 @@ SebeolAutomaton.prototype._flush = function () {
   this._jamoQueue.length = 0;
 };
 
-SebeolAutomaton.prototype._push = function (buffer, chars) {
-  for (var i = 0; i < chars.length; i++) {
-    if (i in chars) buffer.push(chars[i].c);
-  }
-};
-
 SebeolAutomaton.prototype._renderCurrentBlock = function () {
   var jamo = this._jamoBlock,
       b;

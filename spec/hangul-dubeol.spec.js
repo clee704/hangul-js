@@ -28,7 +28,8 @@ describe('hangul-dubeol.js', function () {
          ['12345\b\b', '123'],
          ['dkssudgktpdy\b', '안녕하세ㅇ'],
          ['dkssudgktpdy\b\b', '안녕하세'],
-         ['dkssudgktpdy\b\b\b', '안녕하']],
+         ['dkssudgktpdy\b\b\b', '안녕하'],
+         ['dks\b', '아']],
         function (input, output) {
           expect(hangul.dubeol.fromQwerty(input)).toEqual(output);
         });

@@ -21,7 +21,8 @@ files = [
 
 preprocessors = {
   // don't forget to prefix paths with **/
-  '**/hangul.js': 'coverage'
+  '**/hangul.js': 'coverage',
+  '**/hangul-*.js': 'coverage'
 };
 
 
