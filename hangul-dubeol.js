@@ -1,7 +1,7 @@
 /**
  * hangul-dubeol.js
  * http://github.com/clee704/hangul-js
- * @version 1.1.1
+ * @version 1.1.2
  * @copyright Copyright 2013, Choongmin Lee
  * @license MIT license
  */
