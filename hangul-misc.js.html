@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: hangul-misc.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: hangul-misc.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>/**
+ * hangul-misc.js
+ * http://github.com/clee704/hangul-js
+ * @version 1.1.1
+ * @copyright Copyright 2013, Choongmin Lee
+ * @license MIT license
+ */
+/**
+ * Miscellaneous functions
+ * @namespace hangul.misc
+ */
+(function (hangul, undefined) {
+"use strict";
+
+/**
+ * Writes the specified hangul text in a full-width (全角) style.
+ * @param {string} text
+ * @function hangul.misc.applyFullWidthStyle
+ */
+function applyFullWidthStyle(text) {
+  var buffer = [];
+  for (var i = 0; i &lt; text.length; i++) {
+    var c = text.charAt(i);
+    if (c === ' ') continue;
+    if (c === '\\') {
+      c = '\uffe6';
+    } else if ('!' &lt;= c && c &lt;= '~') {
+      c = String.fromCharCode(c.charCodeAt(0) + 0xfee0);
+    }
+    buffer.push(c);
+  }
+  return buffer.join('');
+}
+
+/**
+ * Writes the specified hangul text as if it is typed with the shift key
+ * pressed all the time.
+ * @param {string} text
+ * @param {namespace} layout {@link hangul.dubeol} or {@link hangul.sebeol}
+ * @function hangul.misc.withShift
+ */
+function withShift(text, layout) {
+  return _shift(text, layout);
+}
+
+/**
+ * Writes the specified hangul text as if it is typed without using the shift
+ * key.
+ * @param {string} text
+ * @param {namespace} layout {@link hangul.dubeol} or {@link hangul.sebeol}
+ * @function hangul.misc.withNoShift
+ */
+function withNoShift(text, layout) {
+  return _shift(text, layout, true);
+}
+
+var qwertyShiftMap = new hangul.Map({
+  'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D', 'e': 'E', 'f': 'F', 'g': 'G',
+  'h': 'H', 'i': 'I', 'j': 'J', 'k': 'K', 'l': 'L', 'm': 'M', 'n': 'N',
+  'o': 'O', 'p': 'P', 'q': 'Q', 'r': 'R', 's': 'S', 't': 'T', 'u': 'U',
+  'v': 'V', 'w': 'W', 'x': 'X', 'y': 'Y', 'z': 'Z', '`': '~', '1': '!',
+  '2': '@', '3': '#', '4': '$', '5': '%', '6': '^', '7': '&', '8': '*',
+  '9': '(', '0': ')', '-': '_', '=': '+', '[': '{', ']': '}', '\\': '|',
+  ';': ':', '\'': '"', ',': '&lt;', '.': '>', '/': '?'
+});
+
+function _shift(text, layout, reverse) {
+  var buffer = [];
+  for (var i = 0; i &lt; text.length; i++) {
+    // dubeol examples:
+    //   original - qwerty - qwerty (upper) - result
+    //   ㅁ     a    A        ㅁ
+    //   만     aks    AKS        만
+    //   ab     ab     AB         AB
+    // sebeol examples:
+    //   간     kfs    KFS        2ㄻㄶ
+    //   ㅃ     ;;     ::         44
+    //   .      .    >        .
+    //   &lt;>     []     {}         %/
+    var c = text.charAt(i);
+    var q = layout.toQwerty(c);
+    if (c !== q || layout.map.hasValue(c)) {
+      var x = layout.fromQwerty(_upperStr(q, reverse));
+    } else {
+      var x = _upper(c, reverse);
+    }
+    buffer.push(x);
+  }
+  return buffer.join('');
+}
+
+function _upperStr(s, reverse) {
+  var buffer = [];
+  for (var i = 0; i &lt; s.length; i++) {
+    buffer.push(_upper(s.charAt(i), reverse));
+  }
+  return buffer.join('');
+}
+
+function _upper(c, reverse) {
+  return !reverse ? qwertyShiftMap.get(c) || c
+                  : qwertyShiftMap.inverse.get(c) || c;
+}
+
+/**
+ * Writes the specified hangul text in a serialized style (풀어쓰기).
+ * @param {string} text
+ * @function hangul.misc.serialize
+ */
+function serialize(text) {
+  var buffer = [];
+  text = _decomposeAll(text, false);
+  for (var i = 0; i &lt; text.length; i++) {
+    var c0 = text.charAt(i);
+    var c1 = text.charAt(i + 1);
+    if (c0 === '\u3147' && hangul.isMedial(c1)) continue;
+    buffer.push(c0);
+  }
+  return buffer.join('');
+}
+
+function _decomposeAll(text, breakFinal) {
+  var buffer = [];
+  for (var i = 0; i &lt; text.length; i++) {
+    var c = text.charAt(i);
+    if (!hangul.isSyllable(c)) {
+      buffer.push(c);
+      continue;
+    }
+    var jamo = hangul.decompose(c);
+    buffer.push(jamo[0]);
+    buffer.push(jamo[1]);
+    if (!jamo[2]) continue;
+    var cc = hangul.decomposeDoubleJamo(jamo[2]);
+    if (breakFinal && cc) {
+      buffer.push(cc[0], cc[1]);
+    } else {
+      buffer.push(jamo[2]);
+    }
+  }
+  return buffer.join('');
+}
+
+/**
+ * Writes the specified hangul text in an initials-only style (초성체).
+ * @param {string} text
+ * @function hangul.misc.getInitials
+ */
+function getInitials(text) {
+  var buffer = [];
+  for (var i = 0; i &lt; text.length; i++) {
+    var c = text.charAt(i);
+    buffer.push(hangul.getInitial(c) || c);
+  }
+  return buffer.join('');
+}
+
+/**
+ * Moves every initial of hangul syllables in the text to the final of the
+ * previous syllable as long as the pronunciation is same (초성 올려 쓰기).
+ * @example
+ * tugInitials('여기서 놉세');  // returns '역잇어 놊에'
+ * @param {string} text
+ * @function hangul.misc.tugInitials
+ */
+function tugInitials(text) {
+  var buffer = [];
+  text = _decomposeAll(text, true);
+  for (var i = 0; i &lt; text.length; i++) {
+    var c0 = text.charAt(i);
+    var c1 = text.charAt(i + 1);
+    var c2 = text.charAt(i + 2);
+    var c3 = text.charAt(i + 3);
+    i = _tugInitials(buffer, text, i, c0, c1, c2, c3);
+  }
+  return buffer.join('');
+}
+
+function _tugInitials(buffer, text, i, c0, c1, c2, c3) {
+  if (hangul.isMedial(c0) && hangul.getFinal(buffer[buffer.length - 1])) {
+    c3 = c2;
+    c2 = c1;
+    c1 = c0;
+    c0 = '\u3147';
+    i -= 1;
+  }
+  if (!hangul.isInitial(c0) || !hangul.isMedial(c1)) {
+    buffer.push(c0);
+    return i;
+  }
+  if (!hangul.isFinal(c2) || !_isOkToTug(c2, c3)) {
+    buffer.push(hangul.compose(c0, c1));
+    return i += 1;
+  }
+  var d = hangul.composeDoubleJamo(c2, c3);
+  if (!hangul.isFinal(d) ||
+      (hangul.isMedial(text.charAt(i + 4)) &&
+       (c3 === '\u314e' ||
+        (c2 === c3 && (c2 === '\u3131' || c2 === '\u3145'))))) {
+    buffer.push(hangul.compose(c0, c1, c2));
+    return i += 2;
+  }
+  buffer.push(hangul.compose(c0, c1, d));
+  return i += 3;
+}
+
+function _isOkToTug(c2, c3) {
+  return !hangul.isMedial(c3) ||
+      (!hangul.isIotizedVowel(c3) || c2 !== '\u3137' && c2 !== '\u314c') &&
+      c2 !== '\u3147' &&
+      c2 !== '\u314e';
+}
+
+/**
+ * Moves every final of hangul syllables in the text to the initial of the
+ * next syllable as long as the pronunciation is same (종성 내려 쓰기).
+ * @example
+ * nudgeFinals('남이섬에 가요');  // returns '나미서메 가요'
+ * @param {string} text
+ * @function hangul.misc.nudgeFinals
+ */
+function nudgeFinals(text) {
+  var buffer = [];
+  for (var i = 0; i &lt; text.length; i++) {
+    buffer.push(text.charAt(i));
+  }
+  for (var i = 0; i &lt; buffer.length; i++) {
+    var jamo0 = hangul.decompose(buffer[i]);
+    var jamo1 = hangul.decompose(buffer[i + 1]);
+    if (!jamo0 || !jamo1) {
+      continue;
+    }
+    var fin = jamo0[2];
+    if (!fin) {
+      continue;
+    }
+    var ini = jamo1[0];
+    var med = jamo1[1];
+    if (_isOkToNudge(fin, ini, med)) {
+      var cc = hangul.decomposeDoubleJamo(fin);
+      if (cc && !hangul.isInitial(fin)) {
+        buffer[i] = hangul.compose(jamo0[0], jamo0[1], cc[0]);
+        buffer[i + 1] = hangul.compose(cc[1], med, jamo1[2]);
+      } else {
+        buffer[i] = hangul.compose(jamo0[0], jamo0[1]);
+        buffer[i + 1] = hangul.compose(fin, med, jamo1[2]);
+      }
+      continue;
+    }
+    var d = hangul.composeDoubleJamo(fin, ini);
+    if (d && hangul.isInitial(d)) {
+      buffer[i] = hangul.compose(jamo0[0], jamo0[1]);
+      buffer[i + 1] = hangul.compose(d, med, jamo1[2]);
+    }
+  }
+  return buffer.join('');
+}
+
+function _isOkToNudge(fin, ini, med) {
+  return fin !== '\u3147' && fin !== '\u314e' && fin !== '\u3136' &&
+      fin !== '\u3140' && ini === '\u3147' &&
+      (fin !== '\u3137' && fin !== '\u314c' || !hangul.isIotizedVowel(med));
+}
+
+hangul.misc = {
+  applyFullWidthStyle: applyFullWidthStyle,
+  withShift: withShift,
+  withNoShift: withNoShift,
+  serialize: serialize,
+  getInitials: getInitials,
+  tugInitials: tugInitials,
+  nudgeFinals: nudgeFinals
+};
+
+})(hangul);
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="hangul.dubeol.Automaton.html">Automaton</a></li><li><a href="hangul.Map.html">Map</a></li><li><a href="hangul.sebeol.Automaton.html">Automaton</a></li><li><a href="hangul.Set.html">Set</a></li></ul><h3>Namespaces</h3><ul><li><a href="hangul.html">hangul</a></li><li><a href="hangul.dubeol.html">dubeol</a></li><li><a href="hangul.misc.html">misc</a></li><li><a href="hangul.sebeol.html">sebeol</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Mon Apr 22 2013 01:54:17 GMT+0900 (KST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
