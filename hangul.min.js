@@ -1,5 +1,5 @@
 /**
- * hangul.js 1.1.1dev
+ * hangul.js 1.1.1
  * http://github.com/clee704/hangul-js
  * @license Copyright 2013, Choongmin Lee; MIT license
  */
