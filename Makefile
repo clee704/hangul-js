@@ -21,6 +21,6 @@ init:
 	npm install -g git://github.com/jsdoc3/jsdoc.git
 
 docs:
-	jsdoc -d docs $(sources) README.md
+	jsdoc -d docs -t jsdoc_template $(sources) README.md
 
 .PHONY: min test karma clean init docs
