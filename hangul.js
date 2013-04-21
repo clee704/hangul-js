@@ -1,7 +1,12 @@
 /**
- * hangul.js 1.1.1
+ * hangul.js
  * http://github.com/clee704/hangul-js
- * @license Copyright 2013, Choongmin Lee; MIT license
+ * @version 1.1.1
+ * @copyright Copyright 2013, Choongmin Lee
+ * @license MIT license
+ */
+/**
+ * @namespace hangul
  */
 var hangul = (function (undefined) {
 "use strict";
@@ -31,6 +36,10 @@ if (!Array.prototype.indexOf) {
   };
 }
 
+/**
+ * @constructor
+ * @name hangul.Set
+ */
 function Set() {
   var i;
   this.items = {};
@@ -39,31 +48,57 @@ function Set() {
   }
 }
 
+/**
+ * Returns true if this set contains the specified object.
+ * @param e {object} object whose presence in this set is to be tested
+ * @method hangul.Set#has
+ */
 Set.prototype.has = function (e) {
   return e in this.items;
 };
 
+/**
+ * Adds the specified object into this set.
+ * @param e {object} object to be added this set
+ * @method hangul.Set#add
+ */
 Set.prototype.add = function (e) {
   this.items[e] = 1;
 };
 
 /**
- * Constructs a simple map, supporting an inverse view, optionally
- * containing properties of the specified object as entries if it is present.
+ * Constructs a new map, optionally containing the properties of the specified
+ * object.
+ * @classdesc A simple map supporting an inverse view.
+ * @constructor
+ * @name hangul.Map
  */
 function Map(o, _inverse) {
   this.items = {};
+  /**
+   * Inverse view of the map.
+   * @member {hangul.Map} hangul.Map#inverse
+   */
   this.inverse = _inverse || new Map(undefined, this);
   if (o) {
     this.addAll(o);
   }
 }
 
+/**
+ * @param k {object} key
+ * @param v {object} value
+ * @method hangul.Map#add
+ */
 Map.prototype.add = function (k, v) {
   this.items[k] = v;
   this.inverse.items[v] = k;
 };
 
+/**
+ * @param o {object} object whose properties are to be added to this map
+ * @method hangul.Map#addAll
+ */
 Map.prototype.addAll = function (o) {
   var k;
   for (k in o) {
@@ -71,37 +106,59 @@ Map.prototype.addAll = function (o) {
   }
 };
 
+/**
+ * Returns true if this map has a mapping for the specified key.
+ * @param k {object} key
+ * @method hangul.Map#hasKey
+ */
 Map.prototype.hasKey = function (k) {
   return k in this.items;
 };
 
+/**
+ * Returns true if this map has a mapping for the specified value.
+ * @param v {object} value
+ * @method hangul.Map#hasValue
+ */
 Map.prototype.hasValue = function (v) {
   return v in this.inverse.items;
 };
 
+/**
+ * Returns the associated object for the specified key or undefined
+ * if there is no mapping for the key.
+ * @param k {object} key
+ * @method hangul.Map#get
+ */
 Map.prototype.get = function (k) {
   return this.items[k];
 };
 
 /**
  * List of modern hangul jamo (U+3131-U+3163).
+ * @member {hangul.Map} hangul.jamo
  */
 var jamo = collectJamo(0x3131, 0x3163);
 
 /**
  * List of modern hangul initial jamo. Actually some of these charaters are
  * not just initials, but can also be final jamo. Thus many characters in this
- * list overlap with the characters in {finals}.
+ * list overlap with the characters in {@link hangul.finals}.
+ * @member {hangul.Map} hangul.initials
  */
 var initials = collectJamo(0x3131, 0x314e,
     [2, 4, 5, 9, 10, 11, 12, 13, 14, 15, 19]);
 
-/** List of modern hangul medials. */
+/**
+ * List of modern hangul medials.
+ * @member {hangul.Map} hangul.medials
+ */
 var medials = collectJamo(0x314f, 0x3163);
 
 /**
- * List of modern hangul finals. The details are the same as {initials}.
- * The list does not include a filler.
+ * List of modern hangul finals. The details are the same as
+ * {@link hangul.initials}. The list does not include a filler.
+ * @member {hangul.Map} hangul.finals
  */
 var finals = collectJamo(0x3131, 0x314e, [7, 18, 24]);
 
@@ -121,6 +178,8 @@ function collectJamo(from, to, exclude) {
  * modern hangul characters (U+3131-U+3163 and U+AC00-U+D7A3; no support for
  * the "Hangul Jamo", "Hangul Jamo Extended-A", "Hangul Jamo Extended-B"
  * blocks).
+ * @param {string} s
+ * @function hangul.isHangul
  */
 function isHangul(s) {
   var c = s && s.charAt && s.charAt(0);
@@ -130,6 +189,8 @@ function isHangul(s) {
 /**
  * Returns true if the first character of the specified string represents
  * modern hangul syllables (U+AC00-U+D7A3).
+ * @param {string} s
+ * @function hangul.isSyllable
  */
 function isSyllable(s) {
   var code = s && s.charCodeAt && s.charCodeAt(0);
@@ -139,6 +200,8 @@ function isSyllable(s) {
 /**
  * Returns true if the first character of the specified string represents
  * modern jamo (U+3131-U+3163).
+ * @param {string} s
+ * @function hangul.isJamo
  */
 function isJamo(s) {
   return jamo.hasValue(s && s.charAt && s.charAt(0));
@@ -147,6 +210,8 @@ function isJamo(s) {
 /**
  * Returns true if the first character of the specified string represents
  * modern hangul initials.
+ * @param {string} s
+ * @function hangul.isInitial
  */
 function isInitial(s) {
   return initials.hasValue(s && s.charAt && s.charAt(0));
@@ -155,6 +220,8 @@ function isInitial(s) {
 /**
  * Returns true if the first character of the specified string represents
  * modern hangul medials.
+ * @param {string} s
+ * @function hangul.isMedial
  */
 function isMedial(s) {
   return medials.hasValue(s && s.charAt && s.charAt(0));
@@ -163,6 +230,8 @@ function isMedial(s) {
 /**
  * Returns true if the first character of the specified string represents
  * modern hangul finals.
+ * @param {string} s
+ * @function hangul.isFinal
  */
 function isFinal(s) {
   return finals.hasValue(s && s.charAt && s.charAt(0));
@@ -171,6 +240,8 @@ function isFinal(s) {
 /**
  * Returns the initial of the first chacater of the specified string.
  * Returns undefined if the character is not a hangul syllable.
+ * @param {string} s
+ * @function hangul.getInitial
  */
 function getInitial(s) {
   var code = s && s.charCodeAt && s.charCodeAt(0);
@@ -180,6 +251,8 @@ function getInitial(s) {
 /**
  * Returns the medial of the first chacater of the specified string.
  * Returns undefined if the character is not a hangul syllable.
+ * @param {string} s
+ * @function hangul.getMedial
  */
 function getMedial(s) {
   var code = s && s.charCodeAt && s.charCodeAt(0);
@@ -190,6 +263,8 @@ function getMedial(s) {
  * Returns the final of the first chacater of the specified string, or
  * an empty string '' if the syllable has no final jamo. Returns undefined
  * if the character is not a hangul syllable.
+ * @param {string} s
+ * @function hangul.getFinal
  */
 function getFinal(s) {
   var code = s && s.charCodeAt && s.charCodeAt(0),
@@ -200,8 +275,11 @@ function getFinal(s) {
 /**
  * Decomposes the first character of the specified string into constituent
  * jamo and returns them as an array of length 3 (or 2 if there is no final).
- * They are obtained using {intial()}, {medial()} and {final_()}. Returns
- * undefined if the character is not a hangul syllable.
+ * They are obtained using {@link hangul.getInitial}, {@link hangul.getMedial}
+ * and {@link hangul.getFinal}. Returns undefined if the character is not a
+ * hangul syllable.
+ * @param {string} s
+ * @function hangul.decompose
  */
 function decompose(s) {
   var c = s && s.charAt && s.charAt(0);
@@ -220,6 +298,8 @@ function decompose(s) {
  * undefined or an empty string '' for the final filler. Returns undefined if
  * any of the arguments are not a modern jamo, except for the final which can
  * also be either undefined or an empty string.
+ * @param {string} s
+ * @function hangul.compose
  */
 function compose(ini, med, fin) {
   var x = initials.inverse.get(ini),
@@ -250,6 +330,9 @@ var doubleJamo = new Map({
 /**
  * Composes from the specified jamo a double jamo. Returns undefined if
  * the specified jamo do not make a double jamo.
+ * @param {string} c1
+ * @param {string} c2
+ * @function hangul.composeDoubleJamo
  */
 function composeDoubleJamo(c1, c2) {
   return doubleJamo.inverse.get(c1 + c2);
@@ -259,12 +342,13 @@ function composeDoubleJamo(c1, c2) {
  * Decomposes the specified double jamo into two jamo and returns them as an
  * array of length 2. Returns undefined if the specified jamo is not a double
  * jamo.
+ * @param {string} c
+ * @function hangul.decomposeDoubleJamo
  */
 function decomposeDoubleJamo(c) {
   var cc = doubleJamo.get(c);
   return cc === undefined ? cc : [cc.charAt(0), cc.charAt(1)];
 }
-
 
 var iotizedVowels = new Set(
   '\u3163', '\u3151', '\u3152', '\u3155', '\u3156', '\u315b', '\u3160'
@@ -274,6 +358,8 @@ var iotizedVowels = new Set(
  * Returns true if the first character of the specified string represents
  * a iotized vowel (including the close front vowel) that may cause
  * palatalization.
+ * @param {string} s
+ * @function hangul.isIotizedVowel
  */
 function isIotizedVowel(s) {
   return iotizedVowels.has(s && s.charAt && s.charAt(0));
