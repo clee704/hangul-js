@@ -159,7 +159,7 @@ function getInitials(text) {
  * Moves every initial of hangul syllables in the text to the final of the
  * previous syllable as long as the pronunciation is same (초성 올려 쓰기).
  * @example
- * tugInitials('여기서 놉세');  // returns '역잇어 놊에'
+ * hangul.misc.tugInitials('여기서 놉세');  // returns '역잇어 놊에'
  * @param {string} text
  * @function hangul.misc.tugInitials
  */
@@ -215,7 +215,7 @@ function _isOkToTug(c2, c3) {
  * Moves every final of hangul syllables in the text to the initial of the
  * next syllable as long as the pronunciation is same (종성 내려 쓰기).
  * @example
- * nudgeFinals('남이섬에 가요');  // returns '나미서메 가요'
+ * hangul.misc.nudgeFinals('남이섬에 가요');  // returns '나미서메 가요'
  * @param {string} text
  * @function hangul.misc.nudgeFinals
  */
