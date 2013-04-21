@@ -7,6 +7,8 @@ Hangul text. Each function is capable of a specific task, such as:
 * to compose/decompose a Hangul syllabic block from/into jamo
 * to convert between different input methods (e.g. Dubeol and QWERTY)
 
+Project documentation: <http://clee704.github.io/hangul-js/>
+
 Development Tools
 -----------------
 You can `make init` to install all required tools.
