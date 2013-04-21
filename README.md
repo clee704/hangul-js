@@ -9,7 +9,10 @@ Hangul text. Each function is capable of a specific task, such as:
 * to compose/decompose a Hangul syllabic block from/into jamo
 * to convert between different input methods (e.g. Dubeol and QWERTY)
 
-Project documentation: <http://clee704.github.io/hangul-js/>
+Links
+-----
+* Project repository: <http://github.com/clee704/hangul-js>
+* Project documentation: <http://clee704.github.io/hangul-js/>
 
 Development Tools
 -----------------
