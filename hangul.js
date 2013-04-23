@@ -298,7 +298,9 @@ function decompose(s) {
  * undefined or an empty string '' for the final filler. Returns undefined if
  * any of the arguments are not a modern jamo, except for the final which can
  * also be either undefined or an empty string.
- * @param {string} s
+ * @param {string} ini initial
+ * @param {string} med medial
+ * @param {string} fin final (optional)
  * @function hangul.compose
  */
 function compose(ini, med, fin) {
